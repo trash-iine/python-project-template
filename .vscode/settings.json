@@ -1,0 +1,11 @@
+{
+    "ruff.enable": true,
+    "ruff.path": [
+        "${workspaceFolder}/.venv/bin/ruff",
+        "ruff"
+    ],
+    "ty.path": [
+        "${workspaceFolder}/.venv/bin/ty",
+        "ty"
+    ]
+}

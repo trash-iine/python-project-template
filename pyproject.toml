@@ -1,0 +1,42 @@
+[project]
+name = "sample-project"
+version = "0.1.0"
+description = "Sample Project for Demonstration"
+readme = "README.md"
+authors = [{ name = "trash-iine" }]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+sample-project = "sample_project.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.9.5,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "furo>=2025.9.25",
+    "myst-parser>=4.0.1",
+    "pyrefly>=0.44.2",
+    "pytest>=9.0.1",
+    "ruff>=0.14.8",
+    "sphinx>=8.2.3",
+    "ty>=0.0.1a32",
+]
+
+[tool.ruff]
+line-length = 120
+select = ["ALL"]
+
+[tool.ruff.per-file-ignores]
+"**/test/*.py" = [
+    "S101",    # Allow assert statements in tests
+    "PLR2004", # Allow magic numbers in tests
+]
+
+"docs/source/conf.py" = [
+    "A001",   # shadowing built-in name
+    "INP001", # No __init__.py file
+    "D100",   # Missing docstring in public module
+]
