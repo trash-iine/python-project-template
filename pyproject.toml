@@ -17,6 +17,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "furo>=2025.9.25",
+    "invoke>=2.2.1",
     "myst-parser>=4.0.1",
     "pyrefly>=0.44.2",
     "pytest>=9.0.1",
@@ -39,4 +40,10 @@ select = ["ALL"]
     "A001",   # shadowing built-in name
     "INP001", # No __init__.py file
     "D100",   # Missing docstring in public module
+]
+
+"tasks.py" = [
+    "ANN001", # Missing type annotation for argument
+    "ANN201", # Missing return type annotation
+    "T201",   # Using print function
 ]
