@@ -17,7 +17,7 @@ def check_env(c):
         print("Error: 'uv' is not installed. Please install 'uv' first.")
         sys.exit(1)
 
-    print("Setting up the development environment...")
+    print("Run: 'uv sync --dev' to set up the development environment.")
     c.run("uv sync --dev")
 
 
@@ -28,7 +28,28 @@ def activate_env(c):
 
 
 @task
-def docs(c):
+def docs(c, output="html"):
     """Build the documentation."""
     activate_env(c)
-    c.run("make -C docs html", warn=True)
+    c.run(f"make -C docs {output}", warn=True)
+
+
+@task
+def test(c):
+    """Run the test suite."""
+    activate_env(c)
+    c.run("pytest test", pty=True)
+
+
+@task
+def format(c, target="."):
+    """Run the formatter."""
+    activate_env(c)
+    c.run(f"ruff format {target}", pty=True)
+
+
+@task
+def check(c, target="."):
+    """Run the linter."""
+    activate_env(c)
+    c.run(f"ruff check {target}", pty=True)

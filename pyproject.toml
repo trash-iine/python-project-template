@@ -28,21 +28,29 @@ dev = [
 
 [tool.ruff]
 line-length = 120
-select = ["ALL"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203",   # This rule is incompatible to `D211`
+    "D213",   # This rule is incompatible to `D212`
+    "COM812", # This rule may cause conflicts
+]
+
+[tool.ruff.lint.per-file-ignores]
 "**/test/*.py" = [
     "S101",    # Allow assert statements in tests
     "PLR2004", # Allow magic numbers in tests
 ]
 
 "docs/source/conf.py" = [
-    "A001",   # shadowing built-in name
+    "A001",   # Shadowing built-in name
     "INP001", # No __init__.py file
     "D100",   # Missing docstring in public module
 ]
 
 "tasks.py" = [
+    "A001",   # Shadowing built-in name
     "ANN001", # Missing type annotation for argument
     "ANN201", # Missing return type annotation
     "T201",   # Using print function
