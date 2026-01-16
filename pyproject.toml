@@ -16,14 +16,20 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "furo>=2025.9.25",
-    "invoke>=2.2.1",
-    "myst-parser>=4.0.1",
-    "pyrefly>=0.44.2",
-    "pytest>=9.0.1",
-    "ruff>=0.14.8",
-    "sphinx>=8.2.3",
-    "ty>=0.0.1a32",
+    # docs
+    "sphinx==8.2.3",      # docs generator, myst-parser v4.0.1 is not supported for sphinx v9+
+    "furo>=2025.12.19",   # docs theme
+    "myst-parser>=4.0.1", # to generate docs with Markdown files
+    "nbsphinx>=0.9.3",    # to generate docs with Jupyter notebooks
+    "ipython>=9.9.0",     # to generate docs with Jupyter notebooks
+    "ipykernel>=7.1.0",   # to generate docs with Jupyter notebooks
+    "pandoc>=2.4",        # to generate docs
+    # lint / type check / test
+    "ruff>=0.14.11", # code linter
+    "ty>=0.0.11",    # type checker
+    "pytest>=9.0.2", # test framework
+    # task runner
+    "invoke>=2.2.1", # task runner
 ]
 
 [tool.ruff]
@@ -47,6 +53,12 @@ ignore = [
     "A001",   # Shadowing built-in name
     "INP001", # No __init__.py file
     "D100",   # Missing docstring in public module
+]
+
+"docs/source/*.ipynb" = [
+    "ANN001", # Missing type annotation for argument
+    "ANN201", # Missing return type annotation
+    "T201",   # Using print function
 ]
 
 "tasks.py" = [
