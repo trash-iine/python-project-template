@@ -15,6 +15,8 @@ author = "Trash-iine"
 
 extensions = [
     "myst_parser",
+    "nbsphinx",
+    "sphinx.ext.mathjax",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",

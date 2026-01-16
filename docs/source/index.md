@@ -9,4 +9,7 @@ caption: Contents:
 ---
 
 sample_project
+markdown_example
+notebook_example
+development_setup
 ```
