@@ -6,6 +6,7 @@
 
 - Python>=3.13
 - [uv](https://github.com/astral-sh/uv)（依存関係/仮想環境管理）
+- [pandoc](https://pandoc.org/)（ドキュメント生成用）
 - 開発支援ツール (`uv sync --dev` で自動導入)
    - [Ruff](https://docs.astral.sh/ruff/) （コード品質チェック）
    - [ty](https://docs.astral.sh/ty/) （型チェック）
