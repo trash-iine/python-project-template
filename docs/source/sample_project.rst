@@ -4,10 +4,10 @@ sample\_project package
 Submodules
 ----------
 
-sample\_project.saple\_add module
----------------------------------
+sample\_project.sample\_add module
+----------------------------------
 
-.. automodule:: sample_project.saple_add
+.. automodule:: sample_project.sample_add
    :members:
    :show-inheritance:
    :undoc-members:
