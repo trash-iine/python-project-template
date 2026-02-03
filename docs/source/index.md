@@ -8,7 +8,7 @@ maxdepth: 1
 caption: Contents:
 ---
 
-sample_project
+modules
 markdown_example
 notebook_example
 development_setup
