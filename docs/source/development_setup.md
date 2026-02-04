@@ -27,6 +27,18 @@ $ git clone https://github.com/trash-iine/python-project-template.git
 $ cd python-project-template
 ```
 
+自分のプロジェクトを新規作成します。
+
+```bash
+$ uv run invoke new-project -p new-project-name -d ~/new-project-dir
+```
+
+新しく作成されたプロジェクトディレクトリに移動します。
+
+```bash
+$ cd ~/new-project-dir
+```
+
 `uv` を使って仮想環境と依存関係をセットアップします。
 
 ```bash

@@ -1,40 +1,14 @@
 # Sample Python Project
 
-シンプルな CLI 付きの Python プロジェクトテンプレート。
+Python プロジェクトテンプレートです。CLI、テスト、ドキュメント生成などの基本構成が含まれています。
 
-## Requirements
-
-- Python>=3.13
-- [uv](https://github.com/astral-sh/uv)（依存関係/仮想環境管理）
-- [pandoc](https://pandoc.org/)（ドキュメント生成用）
-- 開発支援ツール (`uv sync --dev` で自動導入)
-   - [Ruff](https://docs.astral.sh/ruff/) （コード品質チェック）
-   - [ty](https://docs.astral.sh/ty/) （型チェック）
-   - [Pytest](https://docs.pytest.org/) （テストフレームワーク）
-   - [Sphinx](https://www.sphinx-doc.org/) （ドキュメント生成）
-   - [Invoke](https://www.pyinvoke.org/) （タスクランナー）
-
-## Installation
-
-1. リポジトリを取得する
-   ```bash
-   git clone https://github.com/trash-iine/python-project-template.git
-   ```
-2. プロジェクトディレクトリに移動する
-   ```bash
-   cd python-project-template
-   ```
-3. 依存関係をインストールする
-   ```bash
-   uv sync --dev
-   ```
-   `.venv/` が生成され、開発用ツールも導入される
+開始方法は [クイックスタート](https://trash-iine.github.io/python-project-template/quickstart.html) を参照してください。
 
 ## Features & Usage
 
 ### 1. CLI の実行
 
-`src/sample_project/__main__.py` に実装された CLI を実行する。
+`src/sample_project/__main__.py` に実装された CLI を実行します。
 
 ```bash
 $ uv run sample-project
@@ -47,6 +21,8 @@ Or,
 $ uv run python -m sample_project
 Hello, World!
 ```
+
+`src/sample_project/__main__.py` の内容を編集すると実行内容が変更できます。
 
 ### 2. テスト（Pytest）
 
@@ -78,7 +54,6 @@ All checks passed!
 $ uv run invoke format
 7 files left unchanged.
 ```
-
 
 ### 4. ドキュメント生成（Sphinx）
 

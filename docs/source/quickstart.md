@@ -2,10 +2,10 @@
 
 ## Prerequisites
 
-- Python
-- uv
-- Git
-- Pandoc (for documentation generation)
+- [Python](https://www.python.org)
+- [uv](https://github.com/astral-sh/uv)
+- [Git](https://git-scm.com/)
+- [Pandoc](https://pandoc.org/) (for documentation generation)
 
 ## Start a new project
 
@@ -16,7 +16,7 @@ $ cd python-project-template
 ```
 2. 新しいプロジェクトを作成します。
 ```sh
-uv run invoke update-module
+$ uv run invoke new-project -p new-project-name -d ~/new-project-dir
 ```
 3. 作成したプロジェクトディレクトリに移動します。
 ```sh
