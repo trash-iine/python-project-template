@@ -8,8 +8,9 @@ maxdepth: 1
 caption: Contents:
 ---
 
-modules
+quickstart
+development_setup
 markdown_example
 notebook_example
-development_setup
+modules
 ```
