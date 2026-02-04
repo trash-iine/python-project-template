@@ -85,7 +85,7 @@ def _derive_module_name(project_name: str) -> str:
 
 
 @task
-def update_module(c):
+def update_apidoc(c):
     """Update automodule directives in docs."""
     activate_env(c)
     module_name = _derive_module_name(PROJECT_NAME)
