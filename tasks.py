@@ -1,12 +1,20 @@
 """Task definitions using Invoke."""
 
+import re
 import shutil
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from invoke import task
 
 PROJECT_NAME = "sample-project"
+TEMPLATE_AUTHOR = "Trash-iine"
+TEMPLATE_AUTHOR_SLUG = "trash-iine"
+COPY_EXCLUDES = {"uv.lock"}
+TEMPLATE_ONLY_START = "template-only-start"
+TEMPLATE_ONLY_END = "template-only-end"
+TEMPLATE_ONLY_LINE = "template-only-line"
 
 
 def check_env(c):
@@ -112,26 +120,106 @@ def _copy_project_tree(c, dest: Path) -> None:
 
     files = _list_git_files(c)
     for file in files:
+        if file in COPY_EXCLUDES:
+            continue
         src_path = src / file
         dest_path = dest / file
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src_path, dest_path)
 
 
+def _resolve_author(c, author: str) -> str:
+    """Resolve the author name from the option or git config.
+
+    Args:
+        c: Invoke context.
+        author (str): Author name given on the command line (may be empty).
+
+    Returns:
+        str: The resolved author name.
+
+    Raises:
+        ValueError: If no author name can be resolved.
+
+    """
+    if author:
+        return author
+
+    result = c.run("git config user.name", warn=True, hide=True)
+    if result.ok and result.stdout.strip():
+        return result.stdout.strip()
+
+    msg = "Author name is required. Pass --author or set git config user.name."
+    raise ValueError(msg)
+
+
+def _strip_template_sections(text: str) -> str:
+    """Remove template-only lines and blocks marked with HTML comments.
+
+    Args:
+        text (str): The original text.
+
+    Returns:
+        str: The text without template-only lines and blocks.
+
+    """
+    lines = []
+    in_block = False
+    for line in text.splitlines(keepends=True):
+        if TEMPLATE_ONLY_START in line:
+            in_block = True
+            continue
+        if TEMPLATE_ONLY_END in line:
+            in_block = False
+            continue
+        if in_block or TEMPLATE_ONLY_LINE in line:
+            continue
+        lines.append(line)
+    return "".join(lines)
+
+
+def _rewrite_text(data: str, new_project: str, author: str, *, is_markdown: bool) -> str:
+    """Apply all rebranding replacements to a file's content.
+
+    Args:
+        data (str): The original file content.
+        new_project (str): The new project name.
+        author (str): The new author name.
+        is_markdown (bool): Whether the file is Markdown (template-only sections are stripped).
+
+    Returns:
+        str: The rebranded content.
+
+    """
+    module_name = _derive_module_name(PROJECT_NAME)
+    new_module = _derive_module_name(new_project)
+
+    updated = _strip_template_sections(data) if is_markdown else data
+    year = datetime.now(tz=UTC).year
+    updated = re.sub(
+        rf'copyright = "\d{{4}}, {re.escape(TEMPLATE_AUTHOR)}"',
+        f'copyright = "{year}, {author}"',
+        updated,
+    )
+    updated = updated.replace(TEMPLATE_AUTHOR, author)
+    updated = updated.replace(TEMPLATE_AUTHOR_SLUG, author)
+    return updated.replace(PROJECT_NAME, new_project).replace(module_name, new_module)
+
+
 def _replace_in_repo(
     c,
     repo_root: Path,
     new_project: str,
+    author: str,
     *,
     dry_run: bool,
 ) -> None:
-    module_name = _derive_module_name(PROJECT_NAME)
-    new_module = _derive_module_name(new_project)
-
     old_root = Path(__file__).resolve().parent
 
     files = _list_git_files(c)
     for file in files:
+        if file in COPY_EXCLUDES:
+            continue
         path = old_root / file if dry_run else repo_root / file
         if path.is_dir():
             continue
@@ -140,10 +228,7 @@ def _replace_in_repo(
         except UnicodeDecodeError:
             continue
 
-        updated = data.replace(PROJECT_NAME, new_project).replace(module_name, new_module)
-        if path.as_posix().endswith("docs/source/conf.py"):
-            updated = updated.replace('author = "Trash-iine"', "")
-            updated = updated.replace('copyright = "2025, Trash-iine"', "")
+        updated = _rewrite_text(data, new_project, author, is_markdown=path.suffix == ".md")
 
         if updated == data:
             continue
@@ -177,35 +262,53 @@ def _rebrand_project(repo_root: Path, new_project: str, *, dry_run: bool) -> Non
             src_doc.rename(dst_doc)
 
 
-def _set_git_remote(
+def _regenerate_lock(c, repo_root: Path, *, dry_run: bool = False) -> None:
+    if dry_run:
+        print(f"[dry-run] regenerate lock file: {repo_root / 'uv.lock'}")
+        return
+
+    with c.cd(str(repo_root)):
+        result = c.run("uv lock", warn=True)
+    if result.failed:
+        print("Warning: 'uv lock' failed. Run 'uv sync --dev' in the new project to regenerate it.")
+
+
+def _init_git_repo(
     c,
     repo_root: Path,
     remote_url: str,
     *,
     dry_run: bool = False,
 ) -> None:
-    if not remote_url:
-        return
-
     if dry_run:
-        print(f"[dry-run] set git remote origin: {remote_url}")
+        print(f"[dry-run] git init + initial commit: {repo_root}")
+        if remote_url:
+            print(f"[dry-run] set git remote origin: {remote_url}")
         return
 
     with c.cd(str(repo_root)):
         c.run("git init")
-        c.run(f"git remote add origin {remote_url}")
+        c.run("git add -A")
+        c.run('git commit -m "🎉 init"')
+        if remote_url:
+            c.run(f"git remote add origin {remote_url}")
 
 
 @task
 def new_project(
     c,
     dest: str,
-    project_name: str,
+    project_name: str = "",
     remote_url: str = "",
+    author: str = "",
     *,
+    git: bool = True,
     dry_run: bool = False,
 ) -> None:
-    """Copy this repo to dest and rebrand it as a new project."""
+    """Copy this repo to dest and rebrand it as a new project.
+
+    If project_name is omitted, the basename of dest is used.
+    """
     repo_root = Path(__file__).resolve().parent
     dest_path = Path(dest).expanduser().resolve()
 
@@ -213,12 +316,17 @@ def new_project(
         msg = f"Destination path already exists: {dest_path}"
         raise RuntimeError(msg)
 
+    project_name = project_name or dest_path.name
+    _derive_module_name(project_name)  # fail fast on invalid names before copying
+    author = _resolve_author(c, author)
+
     if dry_run:
         print(f"[dry-run] would copy: {repo_root} -> {dest_path}")
     else:
         _copy_project_tree(c, dest_path)
 
-    _replace_in_repo(c, dest_path, project_name, dry_run=dry_run)
-
+    _replace_in_repo(c, dest_path, project_name, author, dry_run=dry_run)
     _rebrand_project(dest_path, project_name, dry_run=dry_run)
-    _set_git_remote(c, dest_path, remote_url, dry_run=dry_run)
+    _regenerate_lock(c, dest_path, dry_run=dry_run)
+    if git:
+        _init_git_repo(c, dest_path, remote_url, dry_run=dry_run)

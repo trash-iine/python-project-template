@@ -62,8 +62,9 @@ ignore = [
 ]
 
 "tasks.py" = [
-    "A001",   # Shadowing built-in name
-    "ANN001", # Missing type annotation for argument
-    "ANN201", # Missing return type annotation
-    "T201",   # Using print function
+    "A001",    # Shadowing built-in name
+    "ANN001",  # Missing type annotation for argument
+    "ANN201",  # Missing return type annotation
+    "T201",    # Using print function
+    "PLR0913", # Task functions are CLI surfaces and may take many arguments
 ]

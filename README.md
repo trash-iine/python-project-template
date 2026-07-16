@@ -1,8 +1,9 @@
-# Sample Python Project
+# sample-project
 
-Python プロジェクトテンプレートです。CLI、テスト、リント、ドキュメント生成、CI などの基本構成が含まれています。
+Python プロジェクトテンプレートです。 <!-- template-only-line -->
+CLI、テスト、リント、ドキュメント生成、CI などの基本構成が含まれています。
 
-生成された API ドキュメントは [GitHub Pages](https://trash-iine.github.io/python-project-template/) で公開されています。
+生成された API ドキュメントは [GitHub Pages](https://trash-iine.github.io/python-project-template/) で公開されています。 <!-- template-only-line -->
 
 ## 前提ツール
 
@@ -17,6 +18,7 @@ Python プロジェクトテンプレートです。CLI、テスト、リント�
 > - **uv**: `curl -LsSf https://astral.sh/uv/install.sh | sh` や `pipx install uv` など
 > - **Pandoc**: `sudo apt install pandoc`（Ubuntu/Debian 系）や [公式サイト](https://pandoc.org/installing.html) から
 
+<!-- template-only-start -->
 ## このテンプレートから新規プロジェクトを作る
 
 1. テンプレートをクローンして移動します。
@@ -26,24 +28,31 @@ Python プロジェクトテンプレートです。CLI、テスト、リント�
    $ cd python-project-template
    ```
 
-2. 新しいプロジェクトを作成します。`sample-project` / `sample_project` が新しい名前に置換された状態でコピーされます。
+2. 新しいプロジェクトを作成します。コピー先ディレクトリの名前がそのままプロジェクト名になり、`sample-project` / `sample_project` と作者名が新しい値に置換された状態でコピーされ、`uv.lock` の再生成と `git init` + 初回コミットまで自動で行われます。
 
    ```bash
-   $ uv run invoke new-project -p new-project-name -d ~/new-project-dir
+   $ uv run invoke new-project -d ~/new-project-name
    ```
 
-   実際に作成する前に処理内容を確認したい場合は `--dry-run` を付けます。
+   オプション:
+
+   - `-p, --project-name <name>`: プロジェクト名(省略時はコピー先ディレクトリ名を使用)
+   - `--author <name>`: 作者名(省略時は `git config user.name` の値を使用)
+   - `--remote-url <url>`: 指定すると `git remote add origin <url>` まで実行
+   - `--no-git`: `git init` と初回コミットを行わない
+   - `--dry-run`: 実際には作成せず処理内容のみ表示
 
    ```bash
-   $ uv run invoke new-project -p new-project-name -d ~/new-project-dir --dry-run
+   $ uv run invoke new-project -d ~/new-project-name --dry-run
    ```
 
 3. 作成したプロジェクトに移動してセットアップします。
 
    ```bash
-   $ cd ~/new-project-dir
+   $ cd ~/new-project-name
    $ uv sync --dev
    ```
+<!-- template-only-end -->
 
 ## セットアップ
 
@@ -145,7 +154,7 @@ $ uv run invoke docs
 | `format` | `uv run invoke format` | Ruff によるフォーマット |
 | `docs` | `uv run invoke docs` | Sphinx で HTML ドキュメントを生成 |
 | `update-apidoc` | `uv run invoke update-apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成。モジュールを追加・リネームしたら実行 |
-| `new-project` | `uv run invoke new-project -p <name> -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） |
+| `new-project` | `uv run invoke new-project -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） | <!-- template-only-line -->
 
 CI（`.github/workflows/tests.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。ローカルでも同じチェックを通しておくと安全です。
 

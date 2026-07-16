@@ -1,6 +1,10 @@
 # Repository Guidelines
 
-This repository is a Python project template (`sample-project`, published as `trash-iine/python-project-template`). Besides serving as a small sample package, it provides a `new-project` Invoke task that copies and rebrands the whole repo into a new project directory.
+This repository contains the `sample-project` Python package.
+
+<!-- template-only-start -->
+It is also a Python project template (published as `trash-iine/python-project-template`): the `new-project` Invoke task copies and rebrands the whole repo into a new project directory.
+<!-- template-only-end -->
 
 ## Project Structure & Module Organization
 - `src/sample_project/` holds the package and CLI entrypoint (`__main__.py`); core logic lives in `sample_add.py`.
@@ -16,7 +20,7 @@ This repository is a Python project template (`sample-project`, published as `tr
 - Lint/format: `uv run ruff check .` and `uv run ruff format .`.
 - Type check: `uv run ty check`.
 - Invoke shortcuts: `uv run invoke test|check|format|docs|update-apidoc` (wrappers around pytest, Ruff, and Sphinx).
-- Scaffold a new project from this template: `uv run invoke new-project -p <name> -d <dir>` (supports `--dry-run`).
+- Scaffold a new project from this template: `uv run invoke new-project -d <dir>` (the project name defaults to the basename of `<dir>`; supports `-p/--project-name`, `--author`, `--remote-url`, `--no-git`, and `--dry-run`). <!-- template-only-line -->
 - CI requires all of `ruff check`, `ruff format --check`, `ty check`, and `pytest` to pass — run them locally before pushing.
 
 ## Coding Style & Naming Conventions
