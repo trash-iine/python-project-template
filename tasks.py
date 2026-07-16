@@ -21,41 +21,35 @@ def check_env(c):
         print("Error: 'uv' is not installed. Please install 'uv' first.")
         sys.exit(1)
 
-    print("Run: 'uv sync --dev' to set up the development environment.")
+    print("Running 'uv sync --dev' to set up the development environment.")
     c.run("uv sync --dev")
-
-
-def activate_env(c):
-    """Activate the development environment."""
-    check_env(c)
-    c.run(". ./.venv/bin/activate")
 
 
 @task
 def docs(c, output="html"):
     """Build the documentation."""
-    activate_env(c)
-    c.run(f"make -C docs {output}", warn=True)
+    check_env(c)
+    c.run(f"make -C docs {output}")
 
 
 @task
 def test(c):
     """Run the test suite."""
-    activate_env(c)
+    check_env(c)
     c.run("pytest test", pty=True)
 
 
 @task
 def format(c, target="."):
     """Run the formatter."""
-    activate_env(c)
+    check_env(c)
     c.run(f"ruff format {target}", pty=True)
 
 
 @task
 def check(c, target="."):
     """Run the linter."""
-    activate_env(c)
+    check_env(c)
     c.run(f"ruff check {target}", pty=True)
 
 
@@ -87,7 +81,7 @@ def _derive_module_name(project_name: str) -> str:
 @task
 def update_apidoc(c):
     """Update automodule directives in docs."""
-    activate_env(c)
+    check_env(c)
     module_name = _derive_module_name(PROJECT_NAME)
     c.run(f"sphinx-apidoc -f -o docs/source/ src/{module_name}", pty=True)
 
@@ -197,8 +191,9 @@ def _set_git_remote(
         print(f"[dry-run] set git remote origin: {remote_url}")
         return
 
-    c.run("git init", cwd=str(repo_root))
-    c.run(f"git remote add origin {remote_url}", cwd=str(repo_root))
+    with c.cd(str(repo_root)):
+        c.run("git init")
+        c.run(f"git remote add origin {remote_url}")
 
 
 @task

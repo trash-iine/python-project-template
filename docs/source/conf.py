@@ -41,5 +41,3 @@ myst_enable_extensions = [
     "html_admonition",
     "html_image",
 ]
-copybutton_prompt_text = ">>> "
-copybutton_prompt_is_regexp = True
