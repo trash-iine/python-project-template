@@ -20,6 +20,25 @@ from sample_project.sample_add import sample_add
 print(sample_add(2, 3))
 ```
 
+エラーハンドリングの例も同様に書けます。
+
+```python
+from sample_project.sample_add import sample_add
+
+try:
+    sample_add("2", 3)
+except TypeError as e:
+    print(f"caught: {e}")
+```
+
+## API リファレンスへのクロスリファレンス
+
+MyST では Sphinx のロールを使って API リファレンスへリンクできます。
+
+- 関数へのリンク: {py:func}`sample_project.sample_add.sample_add`
+- モジュールへのリンク: {py:mod}`sample_project.sample_add`
+- ページへのリンク: [API リファレンス](modules.rst)
+
 ## 引用と注意書き
 
 > 引用は `>` で始めます。文章の抜粋やメモに便利です。
