@@ -33,6 +33,12 @@ def test_strip_template_sections_removes_hash_comment_block() -> None:
     assert _strip_template_sections(text) == "keep\nkeep2\n"
 
 
+def test_strip_template_sections_trims_trailing_blank_lines() -> None:
+    """Test blank lines before a removed EOF block do not linger."""
+    text = "code\n\n\n# template-only-start\ndrop\n# template-only-end\n"
+    assert _strip_template_sections(text) == "code\n"
+
+
 def test_strip_template_sections_keeps_unmarked_text() -> None:
     """Test text without markers is unchanged."""
     text = "no markers\nat all\n"

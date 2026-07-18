@@ -105,7 +105,12 @@ def _strip_template_sections(text: str) -> str:
         if in_block or TEMPLATE_ONLY_LINE in line:
             continue
         lines.append(line)
-    return "".join(lines)
+    stripped = "".join(lines)
+    if stripped == text or not stripped.strip():
+        return stripped
+    # Removing a block at EOF leaves the blank lines that preceded it;
+    # trim them so formatters do not flag the generated file.
+    return stripped.rstrip("\n") + "\n"
 
 
 def _should_strip_template(path: Path) -> bool:
