@@ -3,6 +3,8 @@ name = "sample-project"
 version = "0.1.0"
 description = "Sample Project for Demonstration"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "trash-iine" }]
 requires-python = ">=3.13"
 dependencies = []
