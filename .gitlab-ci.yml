@@ -35,6 +35,8 @@ tests:
     - uv run ruff format --check .
     - uv run ty check
     - uv run pytest
+    - uv export --format requirements-txt --no-hashes --no-emit-project -o requirements-audit.txt
+    - uvx pip-audit -r requirements-audit.txt --disable-pip
 
 pages:
   stage: deploy
