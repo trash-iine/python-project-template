@@ -6,9 +6,17 @@ dist/
 wheels/
 *.egg-info
 .pytest_cache/
+.ruff_cache/
+
+# Test coverage
+.coverage
+htmlcov/
 
 # Virtual environments
 .venv
+
+# uv cache (used by GitLab CI)
+.uv-cache/
 
 # macOS files
 .DS_Store
