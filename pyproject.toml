@@ -25,12 +25,25 @@ dev = [
     "ipykernel>=7.1.0",   # to generate docs with Jupyter notebooks
     "pandoc>=2.4",        # to generate docs
     # lint / type check / test
-    "ruff>=0.14.11", # code linter
-    "ty>=0.0.11",    # type checker
-    "pytest>=9.0.2", # test framework
+    "ruff>=0.14.11",     # code linter
+    "ty>=0.0.11",        # type checker
+    "pytest>=9.0.2",     # test framework
+    "pytest-cov>=7.0.0", # test coverage plugin
     # task runner
     "invoke>=2.2.1", # task runner
 ]
+
+[tool.pytest.ini_options]
+# "src" is included so that --doctest-modules collects docstring Examples.
+testpaths = ["test", "src"]
+addopts = "--doctest-modules --cov=src --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src"]
+
+# Enable a coverage gate once the project has enough code to make it meaningful:
+# [tool.coverage.report]
+# fail_under = 80
 
 [tool.ruff]
 line-length = 120
