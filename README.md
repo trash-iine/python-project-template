@@ -64,6 +64,12 @@ $ uv sync --dev
 
 Ruff・Pytest・Sphinx・Invoke などの開発ツールがインストールされます。以降のコマンドはすべて `uv run <command>` の形で仮想環境内で実行できます（手動での activate は不要です）。
 
+続けて pre-commit フックを有効化します。コミット時に Ruff の自動修正・フォーマットと基本的な検査が自動で実行されるようになります。
+
+```bash
+$ uv run pre-commit install
+```
+
 ## Features & Usage
 
 ### 1. CLI の実行
@@ -105,19 +111,29 @@ TypeError: Invalid types: a=<class 'str'>, b=<class 'int'>
 
 ### 3. テスト（Pytest）
 
-`test/` 配下のテストをすべて実行する。
+`test/` 配下のテストに加えて、`src/` の docstring に書かれた `Examples:`（doctest）も実行し、カバレッジを表示します。
 
 ```bash
 $ uv run invoke test
 ==================== test session starts ====================
-platform darwin -- Python 3.13.11, pytest-9.0.1, pluggy-1.6.0
+platform darwin -- Python 3.13.13, pytest-9.0.2, pluggy-1.6.0
 rootdir: sample-project
-collected 1 item
+configfile: pyproject.toml
+testpaths: test, src
+collected 8 items
 
-test/test_add.py .                                     [100%]
+test/test_add.py .......                               [ 87%]
+src/sample_project/sample_add.py .                     [100%]
 
-===================== 1 passed in 0.00s =====================
+======================= tests coverage =======================
+Name                               Stmts   Miss  Cover   Missing
+----------------------------------------------------------------
+src/sample_project/sample_add.py       5      0   100%
+...
+===================== 8 passed in 0.05s =====================
 ```
+
+カバレッジの合格ライン（ゲート）はテンプレートでは設定していません。コードが増えてきたら `pyproject.toml` のコメントアウトされた `fail_under` を有効化してください。
 
 ### 4. フォーマット（Ruff）
 
@@ -162,8 +178,10 @@ CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml
 $ uv run ruff check .
 $ uv run ruff format --check .
 $ uv run ty check
-$ uv run pytest test
+$ uv run pytest
 ```
+
+CI ではこの 4 チェックに加えて、依存パッケージの脆弱性監査（`pip-audit`）も実行されます（GitHub では週次でも自動実行）。
 
 ## コントリビューション
 
@@ -175,15 +193,23 @@ $ uv run pytest test
 sample-project/
 ├── src/sample_project/       # サンプルプロジェクト
 │   ├── __main__.py           # CLI 実装
-│   └── sample_add.py         # 例示用のシンプルなモジュール
+│   ├── sample_add.py         # 例示用のシンプルなモジュール
+│   └── py.typed              # 型情報配布マーカー（PEP 561）
 ├── test/                     # テストコード（`test_*.py`）
 ├── docs/                     # Sphinx ドキュメント
 │   └── source/               # ドキュメントソース（Markdown / rst / ipynb）
-├── .github/workflows/        # CI（テスト・リント）と GitHub Pages デプロイ
+├── .github/                  # CI・Pages デプロイ・PR / Issue テンプレート・CODEOWNERS・Dependabot
 ├── .gitlab-ci.yml            # GitLab CI（GitHub Actions と同等の CI と GitLab Pages デプロイ）
-├── tasks.py                  # Invoke タスク定義（lint/format/test/docs/new-project）
+├── .vscode/                  # VSCode 推奨拡張と設定
+├── .editorconfig             # エディタ共通設定
+├── .pre-commit-config.yaml   # pre-commit フック定義
+├── tasks.py                  # Invoke タスク定義（lint/format/test/docs）
+├── template_tasks.py         # new-project タスク定義（テンプレート専用） <!-- template-only-line -->
 ├── pyproject.toml            # 依存関係とツール設定
+├── AGENTS.md                 # AI エージェント向けガイド（英語）
 ├── CONTRIBUTING.md           # 開発規則(コントリビューションガイド)
+├── SECURITY.md               # セキュリティポリシー
+├── LICENSE                   # MIT ライセンス
 └── README.md                 # 本ドキュメント
 ```
 

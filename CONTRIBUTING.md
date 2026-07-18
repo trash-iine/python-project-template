@@ -71,6 +71,8 @@
 - 入力ペアやエラー経路の検証には `pytest.mark.parametrize` を優先して使います。
 - テストはハーメティックに保ちます(ネットワークアクセス・外部ファイルシステムへの書き込み禁止)。
 - テスト内の `assert` とマジックナンバーは許可済みです(`per-file-ignores` の S101 / PLR2004)。
+- docstring の `Examples:`(doctest)は `--doctest-modules` により `pytest` 実行時に自動検証されます。例が古くならないよう、動作する形で維持してください。
+- カバレッジは `pytest-cov` で計測され、実行時に表示されます。合格ライン(ゲート)はテンプレートでは未設定です。コードが増えたら `pyproject.toml` のコメントアウトされた `fail_under` を有効化してください。
 
 ## ドキュメント規約
 
@@ -82,16 +84,19 @@
 
 ## CI とローカルチェック
 
-push 前に CI と同じ 4 コマンドをローカルで通してください。
+- セットアップ後に `uv run pre-commit install` を一度実行してください。コミット時に Ruff の自動修正・フォーマットと基本的な検査(YAML / TOML 構文、行末空白など)が自動実行されます。
+  - フックは高速な自動修正系のみです。`ty` や `pytest` は実行時間が長いためフックに含めず、CI で担保します。CI では Ruff を直接実行しているため、pre-commit を CI で重ねて実行することもしません。
+- push 前に CI と同じ 4 コマンドをローカルで通してください。
 
 ```bash
 $ uv run ruff check .
 $ uv run ruff format --check .
 $ uv run ty check
-$ uv run pytest test
+$ uv run pytest
 ```
 
-ショートカットとして Invoke タスク(`uv run invoke test|check|format|docs|update-apidoc`)も利用できます。
+- CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。
+- ショートカットとして Invoke タスク(`uv run invoke test|check|format|docs|update-apidoc`)も利用できます。
 
 ## プルリクエスト / マージリクエスト
 
@@ -105,6 +110,8 @@ $ uv run pytest test
 ## テンプレートのメンテナンス
 
 - このリポジトリはプロジェクトテンプレート(`trash-iine/python-project-template`)を兼ねています。
+- `new-project` タスクとその補助関数はテンプレート専用モジュール `template_tasks.py` にあり、テストは `test/test_template_tasks.py` にあります。両ファイルは `COPY_EXCLUDES` に登録されており、派生プロジェクトにはコピーされません。テンプレート専用のファイルを増やす場合は `COPY_EXCLUDES` に追加してください。
 - Markdown を編集する際は `<!-- template-only-start -->` / `<!-- template-only-end -->` / `<!-- template-only-line -->` マーカーを壊さないでください。テンプレート固有の記述を追加する場合はマーカーで囲みます(`new-project` タスクが派生プロジェクトから自動で取り除きます)。
+- マーカーは Markdown 以外にも `template_tasks.py` の `STRIP_MARKER_FILES` に登録されたファイル(`tasks.py`、`CODEOWNERS`)で有効です。`#` コメント形式でも機能します。
 - テンプレートに関わる変更後は `uv run invoke new-project -d <tmp-dir> --dry-run` で処理内容を確認してください。
 <!-- template-only-end -->
