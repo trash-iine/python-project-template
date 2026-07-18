@@ -61,7 +61,7 @@ ignore = [
     "T201",   # Using print function
 ]
 
-"tasks.py" = [
+"*tasks.py" = [
     "A001",    # Shadowing built-in name
     "ANN001",  # Missing type annotation for argument
     "ANN201",  # Missing return type annotation
