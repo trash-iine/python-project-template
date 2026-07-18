@@ -2,6 +2,8 @@
 
 This repository contains the `sample-project` Python package.
 
+`CONTRIBUTING.md` (Japanese) is the canonical contributor guide; this file is its English digest for AI agents. On conflict, `CONTRIBUTING.md` and `pyproject.toml` win.
+
 <!-- template-only-start -->
 It is also a Python project template (published as `trash-iine/python-project-template`): the `new-project` Invoke task copies and rebrands the whole repo into a new project directory.
 <!-- template-only-end -->
@@ -12,6 +14,10 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - `docs/` stores Sphinx sources (`docs/source/`) and make targets; built HTML lands under `docs/build/` (build artifact, not tracked).
 - `tasks.py` defines Invoke helpers (docs, test, format, check, update-apidoc, new-project); toolchain and lint rules are in `pyproject.toml`.
 - `.github/workflows/` runs CI (`tests.yml`) and deploys docs to GitHub Pages (`docs.yml`); `.gitlab-ci.yml` mirrors both for GitLab (CI checks and GitLab Pages).
+
+## Language Policy
+- Code, identifiers, comments, docstrings, and commit messages: English.
+- User-facing docs (`README.md`, prose pages under `docs/source/`), PR/MR descriptions, and review comments: Japanese.
 
 ## Build, Test, and Development Commands
 - Install deps: `uv sync --dev` (creates `.venv`; rerun after dependency changes). Run everything through `uv run <command>`.
@@ -28,6 +34,8 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Ruff enforces style with line length 120; formatting via `ruff format` keeps imports and whitespace consistent.
 - Modules and functions use `snake_case`; classes use `PascalCase`; tests follow `test_<unit>_<expectation>` naming.
 - Keep docstrings concise with a one-line summary; mention exceptions raised when relevant, and prefer a doctest-style `Examples:` section for public functions.
+- `pyproject.toml` is the single source of truth for lint rules (Ruff `select = ["ALL"]`); never bypass rules except via a reasoned `# noqa: <RULE>` or a commented `per-file-ignores` entry.
+- Raise exceptions via a message variable (`msg = "..."` then `raise TypeError(msg)`, per EM101/EM102); see `src/sample_project/sample_add.py` for the reference docstring and `Examples:` style.
 
 ## Testing Guidelines
 - Use Pytest for unit coverage; favor parametrized cases for input pairs and error paths (e.g., TypeError on non-int input).
@@ -43,6 +51,8 @@ It is also a Python project template (published as `trash-iine/python-project-te
 
 ## Commit & Pull Request Guidelines
 - History uses short, present-tense messages with emoji prefixes (e.g., `🎉 init`, `🚧 add invoke`); follow the same concise style (<=72 chars).
+- Never commit directly to `main`; branch as `<type>/<short-kebab-description>` where type is one of `feature|fix|docs|refactor|test|ci|chore`, matching the gitmoji of the eventual commits.
 - Reference related issues/PRs in the body when applicable.
+- When development rules change, update `CONTRIBUTING.md` and this file in the same PR.
 - Before opening a PR: ensure `ruff check`, `ruff format --check`, `ty check`, and `pytest` pass; include a brief summary of changes and commands executed.
 - For doc or CLI output changes, add screenshots or sample command output in the PR description when helpful.

@@ -165,6 +165,10 @@ $ uv run ty check
 $ uv run pytest test
 ```
 
+## コントリビューション
+
+開発に参加する際の規則(ブランチ運用・コミット規約・コーディング規約)は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
 ## ディレクトリ構成
 
 ```
@@ -179,6 +183,7 @@ sample-project/
 ├── .gitlab-ci.yml            # GitLab CI（GitHub Actions と同等の CI と GitLab Pages デプロイ）
 ├── tasks.py                  # Invoke タスク定義（lint/format/test/docs/new-project）
 ├── pyproject.toml            # 依存関係とツール設定
+├── CONTRIBUTING.md           # 開発規則(コントリビューションガイド)
 └── README.md                 # 本ドキュメント
 ```
 
