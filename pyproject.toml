@@ -21,7 +21,7 @@ dev = [
     # docs
     "sphinx==8.2.3",      # docs generator, myst-parser v4.0.1 is not supported for sphinx v9+
     "furo>=2025.12.19",   # docs theme
-    "myst-parser>=4.0.1", # to generate docs with Markdown files
+    "myst-parser>=5.1.0", # to generate docs with Markdown files
     "nbsphinx>=0.9.3",    # to generate docs with Jupyter notebooks
     "ipython>=9.9.0",     # to generate docs with Jupyter notebooks
     "ipykernel>=7.1.0",   # to generate docs with Jupyter notebooks
