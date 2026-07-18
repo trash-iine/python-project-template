@@ -11,7 +11,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - `test/` contains pytest suites; add new files as `test_*.py` alongside fixtures.
 - `docs/` stores Sphinx sources (`docs/source/`) and make targets; built HTML lands under `docs/build/` (build artifact, not tracked).
 - `tasks.py` defines Invoke helpers (docs, test, format, check, update-apidoc, new-project); toolchain and lint rules are in `pyproject.toml`.
-- `.github/workflows/` runs CI (`tests.yml`) and deploys docs to GitHub Pages (`docs.yml`).
+- `.github/workflows/` runs CI (`tests.yml`) and deploys docs to GitHub Pages (`docs.yml`); `.gitlab-ci.yml` mirrors both for GitLab (CI checks and GitLab Pages).
 
 ## Build, Test, and Development Commands
 - Install deps: `uv sync --dev` (creates `.venv`; rerun after dependency changes). Run everything through `uv run <command>`.
@@ -39,7 +39,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - The root `README.md` is the single source of truth for setup and usage instructions — do not duplicate setup steps under `docs/`; `docs/source/` holds the API reference and writing-format examples only.
 - After adding or renaming modules in `src/`, run `uv run invoke update-apidoc` to regenerate the API reference (`docs/source/*.rst`).
 - New doc pages go in `docs/source/` and must be added to the `{toctree}` in `docs/source/index.md`.
-- Pushes to `main` deploy the built docs to GitHub Pages automatically.
+- Pushes to `main` deploy the built docs to GitHub Pages (or GitLab Pages) automatically.
 
 ## Commit & Pull Request Guidelines
 - History uses short, present-tense messages with emoji prefixes (e.g., `🎉 init`, `🚧 add invoke`); follow the same concise style (<=72 chars).

@@ -141,7 +141,7 @@ $ uv run invoke format
 $ uv run invoke docs
 ```
 
-生成された HTML は `docs/build/html/` に出力されます。ブラウザで `docs/build/html/index.html` を開いて確認できます。また、`main` ブランチへ push すると GitHub Actions（`.github/workflows/docs.yml`）が GitHub Pages へ自動デプロイします。
+生成された HTML は `docs/build/html/` に出力されます。ブラウザで `docs/build/html/index.html` を開いて確認できます。また、デフォルトブランチへ push すると GitHub では GitHub Actions（`.github/workflows/docs.yml`）が GitHub Pages へ、GitLab では GitLab CI（`.gitlab-ci.yml` の `pages` ジョブ）が GitLab Pages へ自動デプロイします。
 
 ## Invoke タスク一覧
 
@@ -156,7 +156,7 @@ $ uv run invoke docs
 | `update-apidoc` | `uv run invoke update-apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成。モジュールを追加・リネームしたら実行 |
 | `new-project` | `uv run invoke new-project -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） | <!-- template-only-line -->
 
-CI（`.github/workflows/tests.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。ローカルでも同じチェックを通しておくと安全です。
+CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。ローカルでも同じチェックを通しておくと安全です。
 
 ```bash
 $ uv run ruff check .
@@ -176,6 +176,7 @@ sample-project/
 ├── docs/                     # Sphinx ドキュメント
 │   └── source/               # ドキュメントソース（Markdown / rst / ipynb）
 ├── .github/workflows/        # CI（テスト・リント）と GitHub Pages デプロイ
+├── .gitlab-ci.yml            # GitLab CI（GitHub Actions と同等の CI と GitLab Pages デプロイ）
 ├── tasks.py                  # Invoke タスク定義（lint/format/test/docs/new-project）
 ├── pyproject.toml            # 依存関係とツール設定
 └── README.md                 # 本ドキュメント
