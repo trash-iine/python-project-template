@@ -18,5 +18,8 @@ htmlcov/
 # uv cache (used by GitLab CI)
 .uv-cache/
 
+# Claude Code local settings (project skills in .claude/skills/ are tracked)
+.claude/settings.local.json
+
 # macOS files
 .DS_Store

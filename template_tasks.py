@@ -17,7 +17,7 @@ from tasks import PROJECT_NAME, _derive_module_name
 
 TEMPLATE_AUTHOR = "Trash-iine"
 TEMPLATE_AUTHOR_SLUG = "trash-iine"
-COPY_EXCLUDES = {"uv.lock", "template_tasks.py", "test/test_template_tasks.py"}
+COPY_EXCLUDES = {"uv.lock", "template_tasks.py", "test/test_template_tasks.py", ".claude/skills/new-project/SKILL.md"}
 STRIP_MARKER_FILES = {"tasks.py", "CODEOWNERS"}
 TEMPLATE_ONLY_START = "template-only-start"
 TEMPLATE_ONLY_END = "template-only-end"

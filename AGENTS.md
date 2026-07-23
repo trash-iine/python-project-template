@@ -15,6 +15,8 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - `tasks.py` defines Invoke helpers (docs, test, format, check, update-apidoc); toolchain and lint rules are in `pyproject.toml`.
 - `template_tasks.py` holds the template-only `new-project` task and helpers (tested in `test/test_template_tasks.py`); both files are excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 - `.github/` holds CI (`workflows/tests.yml`), the docs deploy (`workflows/docs.yml`), PR/issue templates, `CODEOWNERS`, and Dependabot config; `.gitlab-ci.yml` mirrors CI and Pages for GitLab.
+- `.claude/skills/` holds project-shared Claude Code skills: `/quality-check` (run the 4 CI checks and fix failures), `/create-pr` (branch check → checks → gitmoji commit → Japanese PR), `/update-docs` (apidoc regen, new pages, local build). Keep them in sync with this file and `CONTRIBUTING.md` when rules change.
+- `.claude/skills/new-project/SKILL.md` is the template-only scaffolding guide; it is excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 
 ## Language Policy
 - Code, identifiers, comments, docstrings, and commit messages: English.

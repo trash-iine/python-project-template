@@ -98,6 +98,19 @@ $ uv run pytest
 - CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。
 - ショートカットとして Invoke タスク(`uv run invoke test|check|format|docs|update-apidoc`)も利用できます。
 
+## Claude Code skills
+
+- `.claude/skills/` にプロジェクト共有の Claude Code skill を置いています。リポジトリを clone すれば Claude Code のセッションから `/<skill 名>` で利用できます。
+
+  | skill | 用途 |
+  | --- | --- |
+  | `/quality-check` | CI と同じ 4 チェックを一括実行し、失敗を修正して green にする |
+  | `/create-pr` | ブランチ規約チェック → 品質チェック → gitmoji コミット → push → 日本語 PR 作成 |
+  | `/update-docs` | API リファレンス再生成・新規ページ追加・ローカルビルド確認 |
+  | `/new-project` | テンプレートから新プロジェクトを生成する対話的ガイド | <!-- template-only-line -->
+
+- skill の手順は本書の規約を実行手順に落とし込んだものです。規約を変更した場合は該当 skill も同一 PR 内で整合させてください(逆も同様)。
+
 ## プルリクエスト / マージリクエスト
 
 - 説明文(日本語)には次を含めてください:
@@ -111,6 +124,7 @@ $ uv run pytest
 
 - このリポジトリはプロジェクトテンプレート(`trash-iine/python-project-template`)を兼ねています。
 - `new-project` タスクとその補助関数はテンプレート専用モジュール `template_tasks.py` にあり、テストは `test/test_template_tasks.py` にあります。両ファイルは `COPY_EXCLUDES` に登録されており、派生プロジェクトにはコピーされません。テンプレート専用のファイルを増やす場合は `COPY_EXCLUDES` に追加してください。
+- `.claude/skills/new-project/SKILL.md` もテンプレート専用として `COPY_EXCLUDES` に登録済みです。それ以外の skill は派生プロジェクトにコピーされ、プロジェクト名の記述は自動でリブランドされます。テンプレート専用の skill ファイルを増やす場合は `COPY_EXCLUDES` への追加を忘れないでください。
 - Markdown を編集する際は `<!-- template-only-start -->` / `<!-- template-only-end -->` / `<!-- template-only-line -->` マーカーを壊さないでください。テンプレート固有の記述を追加する場合はマーカーで囲みます(`new-project` タスクが派生プロジェクトから自動で取り除きます)。
 - マーカーは Markdown 以外にも `template_tasks.py` の `STRIP_MARKER_FILES` に登録されたファイル(`tasks.py`、`CODEOWNERS`)で有効です。`#` コメント形式でも機能します。
 - テンプレートに関わる変更後は `uv run invoke new-project -d <tmp-dir> --dry-run` で処理内容を確認してください。
