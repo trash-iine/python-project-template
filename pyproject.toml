@@ -19,7 +19,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     # docs
-    "sphinx==8.2.3",      # docs generator, myst-parser v4.0.1 is not supported for sphinx v9+
+    "sphinx==9.1.0",      # docs generator, myst-parser v4.0.1 is not supported for sphinx v9+
     "furo>=2025.12.19",   # docs theme
     "myst-parser>=5.1.0", # to generate docs with Markdown files
     "nbsphinx>=0.9.3",    # to generate docs with Jupyter notebooks
