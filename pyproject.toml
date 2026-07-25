@@ -32,7 +32,7 @@ dev = [
     "pytest>=9.0.2",     # test framework
     "pytest-cov>=7.0.0", # test coverage plugin
     # task runner
-    "invoke>=2.2.1", # task runner
+    "invoke>=3.0.3", # task runner
     # git hooks
     "pre-commit>=4.0.0", # runs lint hooks before each commit
 ]
