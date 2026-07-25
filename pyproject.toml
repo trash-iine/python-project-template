@@ -34,7 +34,7 @@ dev = [
     # task runner
     "invoke>=2.2.1", # task runner
     # git hooks
-    "pre-commit>=4.0.0", # runs lint hooks before each commit
+    "pre-commit>=4.6.1", # runs lint hooks before each commit
 ]
 
 [tool.pytest.ini_options]
