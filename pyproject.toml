@@ -28,7 +28,7 @@ dev = [
     "pandoc>=2.4",        # to generate docs
     # lint / type check / test
     "ruff>=0.15.22",     # code linter
-    "ty>=0.0.61",        # type checker
+    "ty>=0.0.64",        # type checker
     "pytest>=9.0.2",     # test framework
     "pytest-cov>=7.0.0", # test coverage plugin
     # task runner
