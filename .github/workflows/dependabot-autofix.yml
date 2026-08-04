@@ -1,0 +1,61 @@
+name: dependabot-autofix
+
+on:
+  pull_request:
+
+# Dependabot-triggered runs get a read-only GITHUB_TOKEN by default;
+# this key raises it so the job can push the fixes back to the PR branch.
+permissions:
+  contents: write
+
+concurrency:
+  group: dependabot-autofix-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  autofix:
+    # Dependabot PRs only. Their branch lives in this repo, so GITHUB_TOKEN can push to it.
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Without this the checkout is a detached merge commit, which cannot be pushed.
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      # `ruff check --fix` exits non-zero when unfixable violations remain, so keep
+      # going here and let the verification step below be the authoritative gate.
+      - name: Run ruff auto fix
+        run: |
+          uv run ruff check --fix . || true
+          uv run ruff format .
+
+      - name: Commit and push
+        run: |
+          if git diff --quiet; then
+            echo "ruff auto fix produced no changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am ":rotating_light: apply ruff auto fix"
+          git push
+
+      # Pushes made with GITHUB_TOKEN do not trigger new workflow runs, so the `tests`
+      # workflow will not re-run on the commit above. Re-check ruff here instead.
+      - name: Verify ruff
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .

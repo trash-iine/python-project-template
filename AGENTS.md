@@ -14,7 +14,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - `docs/` stores Sphinx sources (`docs/source/`) and make targets; built HTML lands under `docs/build/` (build artifact, not tracked).
 - `tasks.py` defines Invoke helpers (docs, test, format, check, update-apidoc); toolchain and lint rules are in `pyproject.toml`.
 - `template_tasks.py` holds the template-only `new-project` task and helpers (tested in `test/test_template_tasks.py`); both files are excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
-- `.github/` holds CI (`workflows/tests.yml`), the docs deploy (`workflows/docs.yml`), PR/issue templates, `CODEOWNERS`, and Dependabot config; `.gitlab-ci.yml` mirrors CI and Pages for GitLab.
+- `.github/` holds CI (`workflows/tests.yml`), the docs deploy (`workflows/docs.yml`), the Dependabot ruff auto fix (`workflows/dependabot-autofix.yml`), PR/issue templates, `CODEOWNERS`, and Dependabot config; `.gitlab-ci.yml` mirrors CI and Pages for GitLab (Dependabot itself is GitHub-only).
 - `.claude/skills/` holds project-shared Claude Code skills: `/quality-check` (run the 4 CI checks and fix failures), `/create-pr` (branch check → checks → gitmoji commit → Japanese PR), `/update-docs` (apidoc regen, new pages, local build). Keep them in sync with this file and `CONTRIBUTING.md` when rules change.
 - `.claude/skills/new-project/SKILL.md` is the template-only scaffolding guide; it is excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 
@@ -32,6 +32,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Invoke shortcuts: `uv run invoke test|check|format|docs|update-apidoc` (wrappers around pytest, Ruff, and Sphinx).
 - Scaffold a new project from this template: `uv run invoke new-project -d <dir>` (the project name defaults to the basename of `<dir>`; supports `-p/--project-name`, `--author`, `--remote-url`, `--no-git`, and `--dry-run`). <!-- template-only-line -->
 - CI requires all of `ruff check`, `ruff format --check`, `ty check`, and `pytest` to pass — run them locally before pushing. CI additionally audits dependencies with `pip-audit` (weekly schedule on GitHub Actions).
+- On Dependabot PRs, `dependabot-autofix.yml` applies `ruff check --fix` and `ruff format`, commits the result to the PR branch, and re-checks ruff. Fixes ruff cannot apply automatically still fail and need manual work.
 
 ## Coding Style & Naming Conventions
 - Python 3.13; prefer explicit type hints for public functions.
