@@ -98,6 +98,17 @@ $ uv run pytest
 - CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。
 - ショートカットとして Invoke タスク(`uv run invoke test|check|format|docs|update-apidoc`)も利用できます。
 
+## 依存関係の自動更新(GitHub のみ)
+
+- Dependabot が `uv`(`pyproject.toml` / `uv.lock`)、GitHub Actions、pre-commit フックの rev を週次で更新します。設定は `.github/dependabot.yml` です。
+- Ruff は `select = ["ALL"]` のため、バージョンが上がると新規ルールやフォーマッタの挙動変更がそのまま有効になり CI が落ちます。これに対応するため、Dependabot の PR では `.github/workflows/dependabot-autofix.yml` が `ruff check --fix` と `ruff format` を実行し、修正結果を PR ブランチへコミットします。
+- 運用上の注意:
+  - 自動修正できないルール違反(`D` / `ANN` / `PLR` 系など fix を持たないもの)は残ります。その場合ワークフロー末尾の再チェックが赤くなるので、手作業で修正してください。
+  - `GITHUB_TOKEN` による push は新しいワークフロー実行をトリガーしないため、自動修正コミット後も `tests` の結果は古いままです。緑にするには GitHub UI から re-run してください。
+  - Dependabot は自分以外のコミットが載った PR の rebase を停止します。自動修正後に依存を更新し直したい場合は PR を作り直してください。
+- pre-commit の `astral-sh/ruff-pre-commit` の rev は `pyproject.toml` の ruff と揃えてください(Dependabot が両方を更新しますが、PR が分かれた場合は一時的にずれます)。
+- GitLab には Dependabot がないため、この自動更新は GitHub 上でのみ動作します。
+
 ## Claude Code skills
 
 - `.claude/skills/` にプロジェクト共有の Claude Code skill を置いています。リポジトリを clone すれば Claude Code のセッションから `/<skill 名>` で利用できます。
