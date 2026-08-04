@@ -58,6 +58,7 @@ ignore = [
     "D203",   # This rule is incompatible to `D211`
     "D213",   # This rule is incompatible to `D212`
     "COM812", # This rule may cause conflicts
+    "CPY001", # License is declared in LICENSE, not in per-file copyright notices
 ]
 
 [tool.ruff.lint.per-file-ignores]
