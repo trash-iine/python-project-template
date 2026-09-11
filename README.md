@@ -193,8 +193,7 @@ CI ではこの 4 チェックに加えて、依存パッケージの脆弱性�
 sample-project/
 ├── src/sample_project/       # サンプルプロジェクト
 │   ├── __main__.py           # CLI 実装
-│   ├── sample_add.py         # 例示用のシンプルなモジュール
-│   └── py.typed              # 型情報配布マーカー（PEP 561）
+│   └── sample_add.py         # 例示用のシンプルなモジュール
 ├── test/                     # テストコード（`test_*.py`）
 ├── docs/                     # Sphinx ドキュメント
 │   └── source/               # ドキュメントソース（Markdown / rst / ipynb）
