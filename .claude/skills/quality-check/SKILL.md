@@ -27,10 +27,11 @@ uv run pytest
 
 - **フォーマット違反**: `uv run ruff format .` で自動修正する
 - **リント違反**: まず `uv run ruff check --fix .` の自動修正を試し、残りはコード自体の修正を最優先で検討する
+  - D417（`Args:` の引数漏れ）は docstring に `name (type): 説明` 形式で引数説明を追加して直す
 - **ルール抑制は最終手段**: どうしても抑制する場合は CONTRIBUTING.md の抑制ポリシーに従う
   - 行単位: 理由コメント付きの `# noqa: <RULE>`
   - ファイル横断: `pyproject.toml` の `per-file-ignores` に理由コメント付きで追加（既存エントリの書式に合わせる）
-- **型エラー**: 型ヒントの追加・修正で対応する（公開関数は型ヒント必須）
+- **型エラー**: 具体型の修正で対応する。`cast` / `TypeVar` / `Protocol` などの typing 機構や `# ty: ignore` で回避しない（抑制は理由コメント付きの最終手段）
 - **テスト失敗**: テストを弱めるのではなく、原則コード側を直す。doctest（docstring の `Examples:`）の失敗も `pytest` に含まれる点に注意
 
 ### 3. 報告
