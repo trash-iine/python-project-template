@@ -26,4 +26,4 @@ def test_sample_add() -> None:
 def test_sample_add_type_error(a: object, b: object) -> None:
     """Test sample_add raises TypeError on non-int input."""
     with pytest.raises(TypeError):
-        sample_add(a, b)  # ty: ignore[invalid-argument-type]
+        sample_add(a, b)  # ty: ignore[invalid-argument-type]  # wrong types are the point of this test

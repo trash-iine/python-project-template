@@ -28,7 +28,7 @@ def _list_git_files(c) -> list[str]:
     """List all files tracked by git in the given directory.
 
     Args:
-        c: Invoke context.
+        c (Context): Invoke context.
 
     Returns:
         list[str]: A list of file paths relative to cwd.
@@ -42,7 +42,7 @@ def _copy_project_tree(c, dest: Path) -> None:
     """Copy the project tree from src to dest.
 
     Args:
-        c: Invoke context.
+        c (Context): Invoke context.
         dest (Path): Destination path of the new project.
 
     """
@@ -62,7 +62,7 @@ def _resolve_author(c, author: str) -> str:
     """Resolve the author name from the option or git config.
 
     Args:
-        c: Invoke context.
+        c (Context): Invoke context.
         author (str): Author name given on the command line (may be empty).
 
     Returns:
@@ -167,6 +167,16 @@ def _replace_in_repo(
     *,
     dry_run: bool,
 ) -> None:
+    """Rewrite project name, author, and template markers in every tracked text file.
+
+    Args:
+        c (Context): Invoke context.
+        repo_root (Path): Root of the copied project.
+        new_project (str): The new project name.
+        author (str): The new author name.
+        dry_run (bool): If True, only print the files that would change.
+
+    """
     old_root = Path(__file__).resolve().parent
 
     files = _list_git_files(c)
@@ -193,6 +203,14 @@ def _replace_in_repo(
 
 
 def _rebrand_project(repo_root: Path, new_project: str, *, dry_run: bool) -> None:
+    """Rename the source package and its API doc page to the new module name.
+
+    Args:
+        repo_root (Path): Root of the copied project.
+        new_project (str): The new project name.
+        dry_run (bool): If True, only print the renames that would happen.
+
+    """
     module_name = _derive_module_name(PROJECT_NAME)
     new_module = _derive_module_name(new_project)
 
@@ -216,6 +234,14 @@ def _rebrand_project(repo_root: Path, new_project: str, *, dry_run: bool) -> Non
 
 
 def _regenerate_lock(c, repo_root: Path, *, dry_run: bool = False) -> None:
+    """Regenerate uv.lock in the new project.
+
+    Args:
+        c (Context): Invoke context.
+        repo_root (Path): Root of the copied project.
+        dry_run (bool): If True, only print what would be regenerated.
+
+    """
     if dry_run:
         print(f"[dry-run] regenerate lock file: {repo_root / 'uv.lock'}")
         return
@@ -233,6 +259,15 @@ def _init_git_repo(
     *,
     dry_run: bool = False,
 ) -> None:
+    """Initialize a git repository with an initial commit and optional remote.
+
+    Args:
+        c (Context): Invoke context.
+        repo_root (Path): Root of the copied project.
+        remote_url (str): Remote URL to register as origin. Skipped if empty.
+        dry_run (bool): If True, only print the git operations that would run.
+
+    """
     if dry_run:
         print(f"[dry-run] git init + initial commit: {repo_root}")
         if remote_url:
@@ -260,7 +295,18 @@ def new_project(
 ) -> None:
     """Copy this repo to dest and rebrand it as a new project.
 
-    If project_name is omitted, the basename of dest is used.
+    Args:
+        c (Context): Invoke context.
+        dest (str): Destination directory. Must not exist yet.
+        project_name (str): New project name. Defaults to the basename of dest.
+        remote_url (str): Remote URL to register as origin. Skipped if empty.
+        author (str): Author name. Defaults to `git config user.name`.
+        git (bool): If True, run git init and create the initial commit.
+        dry_run (bool): If True, only print what would be done.
+
+    Raises:
+        RuntimeError: If dest already exists.
+
     """
     repo_root = Path(__file__).resolve().parent
     dest_path = Path(dest).expanduser().resolve()

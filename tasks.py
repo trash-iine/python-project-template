@@ -8,7 +8,12 @@ PROJECT_NAME = "sample-project"
 
 
 def check_env(c):
-    """Check if the development environment is set up."""
+    """Check if the development environment is set up.
+
+    Args:
+        c (Context): Invoke context.
+
+    """
     result = c.run("test -d ./.venv", warn=True)
     if result.ok:
         return
@@ -25,28 +30,51 @@ def check_env(c):
 
 @task
 def docs(c, output="html"):
-    """Build the documentation."""
+    """Build the documentation.
+
+    Args:
+        c (Context): Invoke context.
+        output (str): Sphinx builder name passed to `make -C docs`.
+
+    """
     check_env(c)
     c.run(f"make -C docs {output}")
 
 
 @task
 def test(c):
-    """Run the test suite."""
+    """Run the test suite.
+
+    Args:
+        c (Context): Invoke context.
+
+    """
     check_env(c)
     c.run("pytest", pty=True)
 
 
 @task
 def format(c, target="."):
-    """Run the formatter."""
+    """Run the formatter.
+
+    Args:
+        c (Context): Invoke context.
+        target (str): File or directory to format.
+
+    """
     check_env(c)
     c.run(f"ruff format {target}", pty=True)
 
 
 @task
 def check(c, target="."):
-    """Run the linter."""
+    """Run the linter.
+
+    Args:
+        c (Context): Invoke context.
+        target (str): File or directory to lint.
+
+    """
     check_env(c)
     c.run(f"ruff check {target}", pty=True)
 
@@ -78,7 +106,12 @@ def _derive_module_name(project_name: str) -> str:
 
 @task
 def update_apidoc(c):
-    """Update automodule directives in docs."""
+    """Update automodule directives in docs.
+
+    Args:
+        c (Context): Invoke context.
+
+    """
     check_env(c)
     module_name = _derive_module_name(PROJECT_NAME)
     c.run(f"sphinx-apidoc -f -o docs/source/ src/{module_name}", pty=True)
