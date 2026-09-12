@@ -59,6 +59,11 @@ ignore = [
     "D213",   # This rule is incompatible to `D212`
     "COM812", # This rule may cause conflicts
     "CPY001", # License is declared in LICENSE, not in per-file copyright notices
+    # Docstrings are written in Japanese; these English-only heuristics misfire on them
+    "D400",   # Requires the summary line to end with "."; Japanese ends with "。"
+    "D401",   # Imperative mood check only understands English verbs
+    "D403",   # Capitalization check flags summaries starting with identifiers like `uv`
+    "D415",   # Same as D400
 ]
 
 [tool.ruff.lint.per-file-ignores]

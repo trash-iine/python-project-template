@@ -19,8 +19,8 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - `.claude/skills/new-project/SKILL.md` is the template-only scaffolding guide; it is excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 
 ## Language Policy
-- Code, identifiers, comments, docstrings, and commit messages: English.
-- User-facing docs (`README.md`, prose pages under `docs/source/`), PR/MR descriptions, and review comments: Japanese.
+- Identifiers, commit messages, and branch names: English. String literals in code (e.g. exception messages) also stay English so doctest output and logs are environment-independent.
+- Docstrings, inline comments, user-facing docs (`README.md`, prose pages under `docs/source/`), PR/MR descriptions, and review comments: Japanese.
 
 ## Build, Test, and Development Commands
 - Install deps: `uv sync --dev` (creates `.venv`; rerun after dependency changes). Run everything through `uv run <command>`.
@@ -38,7 +38,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Python 3.13; Ruff enforces style with line length 120; formatting via `ruff format` keeps imports and whitespace consistent.
 - Modules and functions use `snake_case`; classes use `PascalCase`; tests follow `test_<unit>_<expectation>` naming.
 - Type hints: annotate every function (public and private) with concrete types only — builtins, stdlib types, project classes, `X | None`, `list[str]`. Use `typing` abstractions (`TypeVar`, `Generic`, `Protocol`, `overload`, `TypeAlias`, `cast`, `TYPE_CHECKING`) only where multiple concrete implementations of different types are actually passed; never generalize something with a single implementation. `Any` is forbidden (ANN401). Fix type errors by correcting concrete types, not with `cast` or `# ty: ignore`.
-- Docstrings: Google style — one-line summary, blank line, then sections. Every function with parameters (private functions and Invoke tasks included) documents all of them under `Args:` as `name (type): description`; add `Returns:` when a value is returned and `Raises:` when an exception is raised; public functions get a doctest-style `Examples:` section. Test functions may use a one-line summary only. Ruff D417 catches missing parameters inside `Args:`, but not a missing `Args:` section — check that in review.
+- Docstrings: Google style, written in Japanese — one-line summary ending in `〜する。`, blank line, then sections with English headers (`Args:` / `Returns:` / `Raises:` / `Examples:`). Ruff D400/D401/D403/D415 are disabled in `pyproject.toml` because they are English-only heuristics. Every function with parameters (private functions and Invoke tasks included) documents all of them under `Args:` as `name (type): description`; add `Returns:` when a value is returned and `Raises:` when an exception is raised; public functions get a doctest-style `Examples:` section. Test functions may use a one-line summary only. Ruff D417 catches missing parameters inside `Args:`, but not a missing `Args:` section — check that in review.
 - Design (necessary and sufficient): write the smallest structure that meets the current requirement. Do not introduce speculative abstractions — base classes, interfaces, plugin hooks, registries, externalized config, wrapper layers, generic utilities — until there are two or more concrete users. Prefer functions over classes and the stdlib over new dependencies. The same applies to types: concrete first, abstraction only under the type-hint rule above.
 - `pyproject.toml` is the single source of truth for lint rules (Ruff `select = ["ALL"]`); never bypass rules except via a reasoned `# noqa: <RULE>` / `# ty: ignore[<rule>]` or a commented `per-file-ignores` entry.
 - Raise exceptions via a message variable (`msg = "..."` then `raise TypeError(msg)`, per EM101/EM102); see `src/sample_project/sample_add.py` for the reference docstring and `Examples:` style.
