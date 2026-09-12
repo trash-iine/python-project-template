@@ -1,4 +1,4 @@
-"""Sample Project Package."""
+"""サンプルプロジェクトのパッケージ。"""
 
 from .sample_add import sample_add
 

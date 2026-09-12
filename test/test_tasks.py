@@ -1,4 +1,4 @@
-"""Test for helper functions in tasks.py."""
+"""tasks.py の補助関数のテスト。"""
 
 import pytest
 
@@ -14,12 +14,12 @@ from tasks import _derive_module_name
     ],
 )
 def test_derive_module_name(project_name: str, expected: str) -> None:
-    """Test module names are derived from project names."""
+    """プロジェクト名からモジュール名が導出されることを確認する。"""
     assert _derive_module_name(project_name) == expected
 
 
 @pytest.mark.parametrize("project_name", ["", "1project", "my.project"])
 def test_derive_module_name_invalid(project_name: str) -> None:
-    """Test invalid project names raise ValueError."""
+    """無効なプロジェクト名で ValueError を送出することを確認する。"""
     with pytest.raises(ValueError, match=r"module_name|Invalid module name"):
         _derive_module_name(project_name)

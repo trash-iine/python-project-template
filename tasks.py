@@ -1,4 +1,4 @@
-"""Task definitions using Invoke."""
+"""Invoke のタスク定義。"""
 
 import sys
 
@@ -8,17 +8,17 @@ PROJECT_NAME = "sample-project"
 
 
 def check_env(c):
-    """Check if the development environment is set up.
+    """開発環境がセットアップ済みか確認し、未整備なら `uv sync --dev` を実行する。
 
     Args:
-        c (Context): Invoke context.
+        c (Context): Invoke のコンテキスト。
 
     """
     result = c.run("test -d ./.venv", warn=True)
     if result.ok:
         return
 
-    # check if uv is installed
+    # uv がインストールされているか確認する
     uv_check = c.run("command -v uv", warn=True)
     if uv_check.failed:
         print("Error: 'uv' is not installed. Please install 'uv' first.")
@@ -30,11 +30,11 @@ def check_env(c):
 
 @task
 def docs(c, output="html"):
-    """Build the documentation.
+    """ドキュメントをビルドする。
 
     Args:
-        c (Context): Invoke context.
-        output (str): Sphinx builder name passed to `make -C docs`.
+        c (Context): Invoke のコンテキスト。
+        output (str): `make -C docs` に渡す Sphinx ビルダー名。
 
     """
     check_env(c)
@@ -43,10 +43,10 @@ def docs(c, output="html"):
 
 @task
 def test(c):
-    """Run the test suite.
+    """テストスイートを実行する。
 
     Args:
-        c (Context): Invoke context.
+        c (Context): Invoke のコンテキスト。
 
     """
     check_env(c)
@@ -55,11 +55,11 @@ def test(c):
 
 @task
 def format(c, target="."):
-    """Run the formatter.
+    """フォーマッタを実行する。
 
     Args:
-        c (Context): Invoke context.
-        target (str): File or directory to format.
+        c (Context): Invoke のコンテキスト。
+        target (str): フォーマット対象のファイルまたはディレクトリ。
 
     """
     check_env(c)
@@ -68,11 +68,11 @@ def format(c, target="."):
 
 @task
 def check(c, target="."):
-    """Run the linter.
+    """リンタを実行する。
 
     Args:
-        c (Context): Invoke context.
-        target (str): File or directory to lint.
+        c (Context): Invoke のコンテキスト。
+        target (str): リント対象のファイルまたはディレクトリ。
 
     """
     check_env(c)
@@ -80,16 +80,16 @@ def check(c, target="."):
 
 
 def _derive_module_name(project_name: str) -> str:
-    """Derive a valid Python module name from a project name.
+    """プロジェクト名から有効な Python モジュール名を導出する。
 
     Args:
-        project_name (str): The new project name.
+        project_name (str): プロジェクト名。
 
     Returns:
-        str: The derived module name.
+        str: 導出したモジュール名。
 
     Raises:
-        ValueError: If the module name is invalid.
+        ValueError: 導出したモジュール名が無効な場合。
 
     """
     module_name = project_name.lower().replace("-", "_").replace(" ", "_")
@@ -106,10 +106,10 @@ def _derive_module_name(project_name: str) -> str:
 
 @task
 def update_apidoc(c):
-    """Update automodule directives in docs.
+    """API リファレンス (docs の automodule ディレクティブ) を再生成する。
 
     Args:
-        c (Context): Invoke context.
+        c (Context): Invoke のコンテキスト。
 
     """
     check_env(c)
@@ -118,8 +118,8 @@ def update_apidoc(c):
 
 
 # template-only-start
-# Expose the template-only new-project task to invoke. The sys.modules guard
-# avoids a circular-import failure when template_tasks is imported first.
+# テンプレート専用の new-project タスクを invoke に公開する。sys.modules の
+# ガードは template_tasks が先に import された場合の循環 import を防ぐ。
 if "template_tasks" not in sys.modules:
     from template_tasks import new_project  # noqa: F401
 # template-only-end

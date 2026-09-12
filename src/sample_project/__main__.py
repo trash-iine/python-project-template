@@ -1,8 +1,8 @@
-"""Sample Project Main Module."""
+"""サンプルプロジェクトのエントリポイント。"""
 
 
 def main() -> None:
-    """Print Hello World."""
+    """Hello World を表示する。"""
     print("Hello, World!")  # noqa: T201
 
 
