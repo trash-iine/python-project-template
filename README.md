@@ -114,7 +114,7 @@ TypeError: Invalid types: a=<class 'str'>, b=<class 'int'>
 `test/` 配下のテストに加えて、`src/` の docstring に書かれた `Examples:`（doctest）も実行し、カバレッジを表示します。
 
 ```bash
-$ uv run invoke test
+$ uv run pytest
 ==================== test session starts ====================
 platform darwin -- Python 3.13.13, pytest-9.0.2, pluggy-1.6.0
 rootdir: sample-project
@@ -140,12 +140,12 @@ src/sample_project/sample_add.py       5      0   100%
 リントとフォーマットを行う。
 
 ```bash
-$ uv run invoke check
+$ uv run ruff check .
 All checks passed!
 ```
 
 ```bash
-$ uv run invoke format
+$ uv run ruff format .
 7 files left unchanged.
 ```
 
@@ -157,31 +157,24 @@ $ uv run invoke format
 $ uv run invoke docs
 ```
 
-生成された HTML は `docs/build/html/` に出力されます。ブラウザで `docs/build/html/index.html` を開いて確認できます。また、デフォルトブランチへ push すると GitHub では GitHub Actions（`.github/workflows/docs.yml`）が GitHub Pages へ、GitLab では GitLab CI（`.gitlab-ci.yml` の `pages` ジョブ）が GitLab Pages へ自動デプロイします。
+生成された HTML は `docs/build/html/` に出力されます。`--open` を付けるとビルド後に `docs/build/html/index.html` をブラウザで開き、`--strict` を付けると warning をエラー扱いにします（`--clean` で前回の生成物を消してから再ビルド）。また、デフォルトブランチへ push すると GitHub では GitHub Actions（`.github/workflows/docs.yml`）が GitHub Pages へ、GitLab では GitLab CI（`.gitlab-ci.yml` の `pages` ジョブ）が GitLab Pages へ自動デプロイします。
 
 ## Invoke タスク一覧
 
-開発タスクは `tasks.py` に [Invoke](https://www.pyinvoke.org/) タスクとして定義されています。
+複数ステップをまとめる開発タスクは `tasks.py` に [Invoke](https://www.pyinvoke.org/) タスクとして定義されています（単独コマンドは `uv run pytest` のように直接実行します）。
 
 | タスク | 実行例 | 説明 |
 | --- | --- | --- |
-| `test` | `uv run invoke test` | `test/` 配下の Pytest を実行 |
-| `check` | `uv run invoke check` | Ruff によるリント |
-| `format` | `uv run invoke format` | Ruff によるフォーマット |
-| `docs` | `uv run invoke docs` | Sphinx で HTML ドキュメントを生成 |
-| `update-apidoc` | `uv run invoke update-apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成。モジュールを追加・リネームしたら実行 |
+| `ci` | `uv run invoke ci` | CI と同じ 4 チェック（`ruff check` / `ruff format --check` / `ty check` / `pytest`）を失敗しても最後まで実行し、結果を集計 |
+| `fix` | `uv run invoke fix` | `ruff check --fix` と `ruff format` で自動修正 |
+| `audit` | `uv run invoke audit` | CI と同じ手順で依存パッケージの脆弱性を `pip-audit` で監査 |
+| `docs` | `uv run invoke docs [--clean] [--strict] [--open]` | Sphinx で HTML ドキュメントを生成 |
+| `apidoc` | `uv run invoke apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成し、参照先モジュールが消えたページを削除。モジュールを追加・リネームしたら実行 |
 | `new-project` | `uv run invoke new-project -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） | <!-- template-only-line -->
 
-CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。ローカルでも同じチェックを通しておくと安全です。
+CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。push 前に `uv run invoke ci` で同じチェックを通しておくと安全です。
 
-```bash
-$ uv run ruff check .
-$ uv run ruff format --check .
-$ uv run ty check
-$ uv run pytest
-```
-
-CI ではこの 4 チェックに加えて、依存パッケージの脆弱性監査（`pip-audit`）も実行されます（GitHub では週次でも自動実行）。
+CI ではこの 4 チェックに加えて、依存パッケージの脆弱性監査（`pip-audit`）も実行されます（GitHub では週次でも自動実行）。ローカルでは `uv run invoke audit` で同じ監査を実行できます。
 
 ## コントリビューション
 
@@ -202,7 +195,7 @@ sample-project/
 ├── .vscode/                  # VSCode 推奨拡張と設定
 ├── .editorconfig             # エディタ共通設定
 ├── .pre-commit-config.yaml   # pre-commit フック定義
-├── tasks.py                  # Invoke タスク定義（lint/format/test/docs）
+├── tasks.py                  # Invoke タスク定義（ci/fix/audit/docs/apidoc）
 ├── template_tasks.py         # new-project タスク定義（テンプレート専用） <!-- template-only-line -->
 ├── pyproject.toml            # 依存関係とツール設定
 ├── AGENTS.md                 # AI エージェント向けガイド（英語）

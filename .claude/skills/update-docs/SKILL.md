@@ -21,10 +21,10 @@ Sphinx + MyST ドキュメントを規約（CONTRIBUTING.md「ドキュメント
 ### 2. API リファレンス再生成
 
 ```bash
-uv run invoke update-apidoc
+uv run invoke apidoc
 ```
 
-`docs/source/*.rst` が再生成される。リネーム時は古いモジュールの `.rst` が残っていないか確認し、残っていれば削除する。
+`docs/source/*.rst` が再生成され、参照先モジュールが消えた古い `.rst` は自動で削除される（`Removing stale page:` として表示される）。出力で削除されたページが意図どおりか確認する。
 
 ### 3. 新規ページ追加
 
@@ -35,11 +35,11 @@ uv run invoke update-apidoc
 ### 4. ローカルビルド確認
 
 ```bash
-uv run invoke docs
+uv run invoke docs --strict
 ```
 
-- warning が出ないことを確認する（出た場合は解消する）
-- 生成物は `docs/build/html/` に出力される（git 管理外）。必要に応じて `docs/build/html/index.html` の内容を確認する
+- `--strict` は warning をエラー扱いにする。ビルドが失敗したら warning を解消して再実行する
+- 生成物は `docs/build/html/` に出力される（git 管理外）。ユーザーに見せる場合は `--open` を付けるとブラウザで開く
 
 ### 5. 報告
 

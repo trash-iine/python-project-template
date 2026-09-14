@@ -98,7 +98,7 @@
 ## ドキュメント規約
 
 - ドキュメントは Sphinx + MyST + nbsphinx で生成します。ローカルビルドは `uv run invoke docs`。
-- `src/` のモジュールを追加・リネームしたら `uv run invoke update-apidoc` で API リファレンスを再生成してください。
+- `src/` のモジュールを追加・リネームしたら `uv run invoke apidoc` で API リファレンスを再生成してください(参照先モジュールが消えた `.rst` は自動で削除されます)。
 - 新規ページは `docs/source/` に置き、`docs/source/index.md` の `{toctree}` に必ず追加します。
 - セットアップ手順は README.md のみに記載します(`docs/` 配下に重複させない)。
 - `main` への push で GitHub Pages / GitLab Pages に自動デプロイされます。
@@ -107,7 +107,7 @@
 
 - セットアップ後に `uv run pre-commit install` を一度実行してください。コミット時に Ruff の自動修正・フォーマットと基本的な検査(YAML / TOML 構文、行末空白など)が自動実行されます。
   - フックは高速な自動修正系のみです。`ty` や `pytest` は実行時間が長いためフックに含めず、CI で担保します。CI では Ruff を直接実行しているため、pre-commit を CI で重ねて実行することもしません。
-- push 前に CI と同じ 4 コマンドをローカルで通してください。
+- push 前に `uv run invoke ci` で CI と同じ 4 チェックをローカルで通してください。失敗しても最後まで実行され、末尾に各チェックの成否が集計されます。CI で実行される内容は次のとおりです。
 
 ```bash
 $ uv run ruff check .
@@ -116,8 +116,10 @@ $ uv run ty check
 $ uv run pytest
 ```
 
-- CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。
-- ショートカットとして Invoke タスク(`uv run invoke test|check|format|docs|update-apidoc`)も利用できます。
+- `tasks.py` の `CI_CHECKS` は CI ワークフロー(`.github/workflows/tests.yml` / `.gitlab-ci.yml`)のミラーです。CI のチェック内容を変えるときは両方を同期させてください。
+- Ruff の自動修正とフォーマットは `uv run invoke fix` でまとめて適用できます。
+- CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。ローカルでは `uv run invoke audit` で同じ監査を実行できます。
+- Invoke タスクは複数ステップを束ねるもの(`ci|fix|audit|docs|apidoc`)に限定しています。単独コマンドの薄いラッパーは追加しないでください。
 
 ## 依存関係の自動更新(GitHub のみ)
 

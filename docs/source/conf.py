@@ -26,6 +26,11 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = []
 
+# __init__.py で再エクスポートしたメンバーはサブモジュール側のページで文書化する。
+# __all__ に従うと同じ完全修飾名 (例: sample_project.sample_add) がパッケージ側にも
+# 現れ、"duplicate object description" warning で `invoke docs --strict` が失敗する。
+autodoc_default_options = {"ignore-module-all": True}
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
