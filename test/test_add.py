@@ -1,4 +1,4 @@
-"""Test for sample_add module."""
+"""sample_add モジュールのテスト。"""
 
 import pytest
 
@@ -6,7 +6,7 @@ from sample_project.sample_add import sample_add
 
 
 def test_sample_add() -> None:
-    """Test sample_add function."""
+    """正常な入力で和を返すことを確認する。"""
     assert sample_add(2, 3) == 5
     assert sample_add(-1, 1) == 0
     assert sample_add(0, 0) == 0
@@ -24,6 +24,6 @@ def test_sample_add() -> None:
     ],
 )
 def test_sample_add_type_error(a: object, b: object) -> None:
-    """Test sample_add raises TypeError on non-int input."""
+    """int 以外の入力で TypeError を送出することを確認する。"""
     with pytest.raises(TypeError):
-        sample_add(a, b)  # ty: ignore[invalid-argument-type]
+        sample_add(a, b)  # ty: ignore[invalid-argument-type]  # 型違いの入力を渡すこと自体がテストの目的

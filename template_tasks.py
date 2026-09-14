@@ -1,9 +1,9 @@
-"""Template-only Invoke tasks for scaffolding new projects.
+"""新プロジェクトを生成するテンプレート専用の Invoke タスク。
 
-Everything specific to the project-template workflow lives here (the
-``new-project`` task and its helpers). This module and its tests are
-excluded from the copy when a new project is generated, so derived
-projects never contain template-only code.
+プロジェクトテンプレートのワークフローに固有のもの (``new-project`` タスクと
+その補助関数) はすべてここに置く。このモジュールとそのテストは新プロジェクト
+生成時のコピー対象から除外されるため、派生プロジェクトにテンプレート専用の
+コードが残ることはない。
 """
 
 import re
@@ -25,13 +25,13 @@ TEMPLATE_ONLY_LINE = "template-only-line"
 
 
 def _list_git_files(c) -> list[str]:
-    """List all files tracked by git in the given directory.
+    """git が追跡しているファイルを列挙する。
 
     Args:
-        c: Invoke context.
+        c (Context): Invoke のコンテキスト。
 
     Returns:
-        list[str]: A list of file paths relative to cwd.
+        list[str]: カレントディレクトリからの相対パスのリスト。
 
     """
     result = c.run("git ls-files", hide=True)
@@ -39,11 +39,11 @@ def _list_git_files(c) -> list[str]:
 
 
 def _copy_project_tree(c, dest: Path) -> None:
-    """Copy the project tree from src to dest.
+    """このリポジトリのファイルツリーを dest にコピーする。
 
     Args:
-        c: Invoke context.
-        dest (Path): Destination path of the new project.
+        c (Context): Invoke のコンテキスト。
+        dest (Path): 新プロジェクトの生成先パス。
 
     """
     src = Path(__file__).resolve().parent
@@ -59,17 +59,17 @@ def _copy_project_tree(c, dest: Path) -> None:
 
 
 def _resolve_author(c, author: str) -> str:
-    """Resolve the author name from the option or git config.
+    """著者名をオプションまたは git config から解決する。
 
     Args:
-        c: Invoke context.
-        author (str): Author name given on the command line (may be empty).
+        c (Context): Invoke のコンテキスト。
+        author (str): コマンドラインで指定された著者名 (空文字可)。
 
     Returns:
-        str: The resolved author name.
+        str: 解決した著者名。
 
     Raises:
-        ValueError: If no author name can be resolved.
+        ValueError: 著者名を解決できない場合。
 
     """
     if author:
@@ -84,13 +84,13 @@ def _resolve_author(c, author: str) -> str:
 
 
 def _strip_template_sections(text: str) -> str:
-    """Remove template-only lines and blocks marked with template-only comments.
+    """template-only マーカーで囲まれたブロックと行を取り除く。
 
     Args:
-        text (str): The original text.
+        text (str): 元のテキスト。
 
     Returns:
-        str: The text without template-only lines and blocks.
+        str: テンプレート専用のブロックと行を取り除いたテキスト。
 
     """
     lines = []
@@ -108,35 +108,35 @@ def _strip_template_sections(text: str) -> str:
     stripped = "".join(lines)
     if stripped == text or not stripped.strip():
         return stripped
-    # Removing a block at EOF leaves the blank lines that preceded it;
-    # trim them so formatters do not flag the generated file.
+    # ファイル末尾のブロックを取り除くとその直前の空行が残るため、
+    # 生成ファイルがフォーマッタに弾かれないように末尾の空行を詰める。
     return stripped.rstrip("\n") + "\n"
 
 
 def _should_strip_template(path: Path) -> bool:
-    """Return whether template-only markers should be stripped from the file.
+    """template-only マーカーの除去対象ファイルかどうかを返す。
 
     Args:
-        path (Path): Path of the file being rewritten.
+        path (Path): 書き換え対象ファイルのパス。
 
     Returns:
-        bool: True if template-only sections should be removed.
+        bool: テンプレート専用セクションを取り除くべきなら True。
 
     """
     return path.suffix == ".md" or path.name in STRIP_MARKER_FILES
 
 
 def _rewrite_text(data: str, new_project: str, author: str, *, strip_template: bool) -> str:
-    """Apply all rebranding replacements to a file's content.
+    """ファイル内容にリブランドの置換をすべて適用する。
 
     Args:
-        data (str): The original file content.
-        new_project (str): The new project name.
-        author (str): The new author name.
-        strip_template (bool): Whether template-only sections are stripped.
+        data (str): 元のファイル内容。
+        new_project (str): 新しいプロジェクト名。
+        author (str): 新しい著者名。
+        strip_template (bool): テンプレート専用セクションを取り除くかどうか。
 
     Returns:
-        str: The rebranded content.
+        str: リブランド後の内容。
 
     """
     module_name = _derive_module_name(PROJECT_NAME)
@@ -167,6 +167,16 @@ def _replace_in_repo(
     *,
     dry_run: bool,
 ) -> None:
+    """追跡中の全テキストファイルでプロジェクト名・著者・テンプレートマーカーを書き換える。
+
+    Args:
+        c (Context): Invoke のコンテキスト。
+        repo_root (Path): コピー先プロジェクトのルート。
+        new_project (str): 新しいプロジェクト名。
+        author (str): 新しい著者名。
+        dry_run (bool): True なら変更対象ファイルの表示のみ行う。
+
+    """
     old_root = Path(__file__).resolve().parent
 
     files = _list_git_files(c)
@@ -193,6 +203,14 @@ def _replace_in_repo(
 
 
 def _rebrand_project(repo_root: Path, new_project: str, *, dry_run: bool) -> None:
+    """ソースパッケージと API リファレンスページを新しいモジュール名にリネームする。
+
+    Args:
+        repo_root (Path): コピー先プロジェクトのルート。
+        new_project (str): 新しいプロジェクト名。
+        dry_run (bool): True ならリネーム内容の表示のみ行う。
+
+    """
     module_name = _derive_module_name(PROJECT_NAME)
     new_module = _derive_module_name(new_project)
 
@@ -216,6 +234,14 @@ def _rebrand_project(repo_root: Path, new_project: str, *, dry_run: bool) -> Non
 
 
 def _regenerate_lock(c, repo_root: Path, *, dry_run: bool = False) -> None:
+    """新プロジェクトで uv.lock を再生成する。
+
+    Args:
+        c (Context): Invoke のコンテキスト。
+        repo_root (Path): コピー先プロジェクトのルート。
+        dry_run (bool): True なら再生成対象の表示のみ行う。
+
+    """
     if dry_run:
         print(f"[dry-run] regenerate lock file: {repo_root / 'uv.lock'}")
         return
@@ -233,6 +259,15 @@ def _init_git_repo(
     *,
     dry_run: bool = False,
 ) -> None:
+    """git リポジトリを初期化し、初回コミットと (指定があれば) リモート登録を行う。
+
+    Args:
+        c (Context): Invoke のコンテキスト。
+        repo_root (Path): コピー先プロジェクトのルート。
+        remote_url (str): origin として登録するリモート URL。空文字なら登録しない。
+        dry_run (bool): True なら実行する git 操作の表示のみ行う。
+
+    """
     if dry_run:
         print(f"[dry-run] git init + initial commit: {repo_root}")
         if remote_url:
@@ -258,9 +293,20 @@ def new_project(
     git: bool = True,
     dry_run: bool = False,
 ) -> None:
-    """Copy this repo to dest and rebrand it as a new project.
+    """このリポジトリを dest にコピーし、新プロジェクトとしてリブランドする。
 
-    If project_name is omitted, the basename of dest is used.
+    Args:
+        c (Context): Invoke のコンテキスト。
+        dest (str): 生成先ディレクトリ。未存在であること。
+        project_name (str): 新しいプロジェクト名。省略時は dest のベース名。
+        remote_url (str): origin として登録するリモート URL。空文字なら登録しない。
+        author (str): 著者名。省略時は `git config user.name` から解決する。
+        git (bool): True なら git init と初回コミットを行う。
+        dry_run (bool): True なら処理内容の表示のみ行う。
+
+    Raises:
+        RuntimeError: dest が既に存在する場合。
+
     """
     repo_root = Path(__file__).resolve().parent
     dest_path = Path(dest).expanduser().resolve()
@@ -270,7 +316,7 @@ def new_project(
         raise RuntimeError(msg)
 
     project_name = project_name or dest_path.name
-    _derive_module_name(project_name)  # fail fast on invalid names before copying
+    _derive_module_name(project_name)  # 無効な名前はコピー前に弾く
     author = _resolve_author(c, author)
 
     if dry_run:

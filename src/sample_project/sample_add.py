@@ -1,18 +1,18 @@
-"""Sample Add module."""
+"""足し算のサンプルモジュール。"""
 
 
 def sample_add(a: int, b: int) -> int:
-    """Return the sum of two integers.
+    """2 つの整数の和を返す。
 
     Args:
-        a (int): First integer.
-        b (int): Second integer.
+        a (int): 1 つ目の整数。
+        b (int): 2 つ目の整数。
 
     Raises:
-        TypeError: If a or b is not an integer.
+        TypeError: a または b が整数でない場合。
 
     Returns:
-        int: The sum of a and b.
+        int: a と b の和。
 
     Examples:
         >>> sample_add(2, 3)

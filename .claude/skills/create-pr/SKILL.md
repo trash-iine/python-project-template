@@ -20,13 +20,10 @@ allowed-tools: Bash(git *) Bash(gh *) Bash(uv run *)
 
 ### 2. 品質チェック
 
-CI と同じ 4 コマンドを実行する。失敗があれば `/quality-check` skill の方針で修正してから先へ進む:
+CI と同じ 4 チェック（`ruff check` / `ruff format --check` / `ty check` / `pytest`）を一括実行する。失敗があれば `/quality-check` skill の方針で修正してから先へ進む:
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run ty check
-uv run pytest
+uv run invoke ci
 ```
 
 ### 3. コミット
@@ -35,13 +32,14 @@ uv run pytest
 - 絵文字は CONTRIBUTING.md の対応表に従う: ✨新機能 / 🐛バグ修正 / 📝ドキュメント / ✅テスト / 🎨整形・構造改善 / 🔧設定 / 👷CI / 📦️依存関係
 - 独立した変更が混ざっている場合は意味単位でコミットを分ける
 - 開発規則を変更した場合、CONTRIBUTING.md と AGENTS.md を同一 PR 内で更新済みか確認する
+- 設計判断(開発規則・ツール構成・依存の採否・アーキテクチャ)を伴う場合、ADR(`docs/source/adr/`)が追加済みか確認する。なければ `/adr` skill で作成する
 
 ### 4. push と PR 作成
 
 1. `git push -u origin <branch>` で push する
 2. リモートが **GitHub** の場合: `gh pr create` で PR を作成する。本文は **日本語** で、`.github/PULL_REQUEST_TEMPLATE.md` の構成に従う:
    - **変更概要**: 何を・なぜ。関連 Issue があれば参照
-   - **実行したコマンドと結果**: ステップ 2 の 4 チェックを、実際に実行して成功したものだけチェック済み `[x]` にする
+   - **実行したコマンドと結果**: 4 チェックを個別に列挙し、ステップ 2 の `invoke ci` の summary で成功したものだけチェック済み `[x]` にする
    - **スクリーンショット / サンプル出力**: ドキュメントや CLI 出力の変更時のみ（なければセクションごと削除）
    - **チェックリスト**: 実際に確認した項目のみ `[x]` にする
 3. リモートが **GitLab** の場合: `gh` は使えないため、push 出力に表示される MR 作成 URL を案内し、同じ構成の日本語説明文を貼り付け用に提示する
