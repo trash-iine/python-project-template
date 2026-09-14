@@ -103,6 +103,14 @@
 - セットアップ手順は README.md のみに記載します(`docs/` 配下に重複させない)。
 - `main` への push で GitHub Pages / GitLab Pages に自動デプロイされます。
 
+## 設計判断の記録(ADR)
+
+- 開発規則・ツール構成・依存の採否・アーキテクチャなど、後から「なぜそうしたのか」を問われる判断は ADR(Architecture Decision Record)として `docs/source/adr/` に残します。本書には規則を、ADR にはその理由と検討した選択肢を書く役割分担です。
+- 新規作成は `uv run invoke adr <slug> --title "<タイトル>"` で行います(slug は英語 kebab-case、タイトルと本文は日本語)。採番とテンプレート展開が自動で行われ、一覧ページ(`docs/source/adr/index.md`)には glob で自動的に載ります。
+- 本文は「背景 / 検討した選択肢 / 決定 / 結果」の 4 節です。実際に比較した選択肢だけを書きます。
+- ステータスは `提案中` / `採用` / `廃止` / `NNNN により置換` のいずれかです。採用済みの ADR は本文を書き換えず、判断を変える場合は新しい ADR を作成して旧 ADR のステータスを「NNNN により置換」に更新します。
+- 設計判断を伴う PR では ADR を同一 PR 内で追加してください(PR テンプレートのチェックリストに含まれています)。
+
 ## CI とローカルチェック
 
 - セットアップ後に `uv run pre-commit install` を一度実行してください。コミット時に Ruff の自動修正・フォーマットと基本的な検査(YAML / TOML 構文、行末空白など)が自動実行されます。
@@ -119,7 +127,7 @@ $ uv run pytest
 - `tasks.py` の `CI_CHECKS` は CI ワークフロー(`.github/workflows/tests.yml` / `.gitlab-ci.yml`)のミラーです。CI のチェック内容を変えるときは両方を同期させてください。
 - Ruff の自動修正とフォーマットは `uv run invoke fix` でまとめて適用できます。
 - CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。ローカルでは `uv run invoke audit` で同じ監査を実行できます。
-- Invoke タスクは複数ステップを束ねるもの(`ci|fix|audit|docs|apidoc`)に限定しています。単独コマンドの薄いラッパーは追加しないでください。
+- Invoke タスクは複数ステップを束ねるもの(`ci|fix|audit|docs|apidoc|adr`)に限定しています。単独コマンドの薄いラッパーは追加しないでください(理由は ADR 0002 を参照)。
 
 ## 依存関係の自動更新(GitHub のみ)
 
@@ -141,6 +149,7 @@ $ uv run pytest
   | `/quality-check` | CI と同じ 4 チェックを一括実行し、失敗を修正して green にする |
   | `/create-pr` | ブランチ規約チェック → 品質チェック → gitmoji コミット → push → 日本語 PR 作成 |
   | `/update-docs` | API リファレンス再生成・新規ページ追加・ローカルビルド確認 |
+  | `/adr` | 会話で行った設計判断を ADR として記録する |
   | `/new-project` | テンプレートから新プロジェクトを生成する対話的ガイド | <!-- template-only-line -->
 
 - skill の手順は本書の規約を実行手順に落とし込んだものです。規約を変更した場合は該当 skill も同一 PR 内で整合させてください(逆も同様)。
@@ -151,7 +160,7 @@ $ uv run pytest
   - 変更概要
   - 実行したコマンドとその結果
   - ドキュメントや CLI 出力の変更時は、スクリーンショットまたはサンプル出力
-- 開発規則を変更した場合は、**同一 PR 内で本書と AGENTS.md の両方を更新**してください。
+- 開発規則を変更した場合は、**同一 PR 内で本書と AGENTS.md の両方を更新**し、判断の理由を ADR(`docs/source/adr/`)に記録してください。
 
 <!-- template-only-start -->
 ## テンプレートのメンテナンス

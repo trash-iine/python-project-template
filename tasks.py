@@ -4,7 +4,9 @@
 プロジェクト固有の知識 (モジュール名・パス) を必要とするタスクだけを定義する。
 """
 
+import datetime
 import re
+import string
 import sys
 import tempfile
 import webbrowser
@@ -16,6 +18,10 @@ PROJECT_NAME = "sample-project"
 DOCS_SOURCE = Path("docs/source")
 DOCS_HTML_INDEX = Path("docs/build/html/index.html")
 SRC_ROOT = Path("src")
+ADR_DIR = DOCS_SOURCE / "adr"
+ADR_TEMPLATE = ADR_DIR / "_template.md"
+ADR_SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+ADR_FILE_PATTERN = re.compile(r"^(\d{4})-.+\.md$")
 
 # CI (.github/workflows/tests.yml / .gitlab-ci.yml) と同じ順序・内容。変更時は両方を同期させる。
 CI_CHECKS = [
@@ -89,6 +95,82 @@ def _stale_apidoc_pages(source_dir: Path, src_root: Path) -> list[Path]:
         if modules and not any(_module_exists(src_root, module) for module in modules):
             stale.append(page)
     return stale
+
+
+def _validate_adr_slug(slug: str) -> str:
+    """ADR のファイル名に使う slug が英語 kebab-case であることを検証する。
+
+    Args:
+        slug (str): 検証する slug。
+
+    Returns:
+        str: 検証済みの slug。
+
+    Raises:
+        ValueError: slug が kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`) でない場合。
+
+    """
+    if not ADR_SLUG_PATTERN.match(slug):
+        msg = f"ADR slug must be kebab-case (e.g. 'use-invoke-for-tasks'): {slug!r}"
+        raise ValueError(msg)
+    return slug
+
+
+def _next_adr_number(adr_dir: Path) -> int:
+    """既存の ADR (`NNNN-<slug>.md`) から次の採番を求める。
+
+    Args:
+        adr_dir (Path): ADR を置くディレクトリ。
+
+    Returns:
+        int: 既存の最大番号 + 1。ADR がなければ 1。
+
+    """
+    numbers = [int(m.group(1)) for path in adr_dir.glob("*.md") if (m := ADR_FILE_PATTERN.match(path.name))]
+    return max(numbers, default=0) + 1
+
+
+def _render_adr(template: str, number: int, title: str, date: datetime.date) -> str:
+    """ADR テンプレートのプレースホルダを埋める。
+
+    Args:
+        template (str): `$number` / `$title` / `$date` を含むテンプレート文字列。
+        number (int): ADR 番号。4 桁ゼロ埋めで展開する。
+        title (str): ADR のタイトル。
+        date (datetime.date): 作成日。
+
+    Returns:
+        str: 展開後の Markdown。
+
+    """
+    return string.Template(template).substitute(number=f"{number:04d}", title=title, date=date.isoformat())
+
+
+@task
+def adr(c, slug, title=""):
+    """設計判断の記録 (ADR) をテンプレートから新規作成する。
+
+    Args:
+        c (Context): Invoke のコンテキスト。
+        slug (str): ファイル名に使う英語 kebab-case の識別子 (例: `use-invoke-for-tasks`)。
+        title (str): 見出しに使う日本語タイトル。省略時は slug をそのまま使う。
+
+    Raises:
+        FileExistsError: 同じ番号と slug の ADR が既に存在する場合。
+
+    """
+    _validate_adr_slug(slug)
+    number = _next_adr_number(ADR_DIR)
+    path = ADR_DIR / f"{number:04d}-{slug}.md"
+    if path.exists():
+        msg = f"ADR already exists: {path}"
+        raise FileExistsError(msg)
+
+    template = ADR_TEMPLATE.read_text(encoding="utf-8")
+    today = datetime.datetime.now(tz=datetime.UTC).date()
+    path.write_text(_render_adr(template, number, title or slug, today), encoding="utf-8")
+    print(f"Created {path}")
+    print("Fill in the sections, then run 'uv run invoke docs --strict' to verify the build.")
 
 
 @task

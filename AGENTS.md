@@ -11,11 +11,11 @@ It is also a Python project template (published as `trash-iine/python-project-te
 ## Project Structure & Module Organization
 - `src/sample_project/` holds the package and CLI entrypoint (`__main__.py`); core logic lives in `sample_add.py`.
 - `test/` contains pytest suites; add new files as `test_*.py` alongside fixtures.
-- `docs/` stores Sphinx sources (`docs/source/`) and make targets; built HTML lands under `docs/build/` (build artifact, not tracked).
-- `tasks.py` defines Invoke tasks that bundle multiple steps (`ci`, `fix`, `audit`, `docs`, `apidoc`); single commands are run directly, not wrapped. Toolchain and lint rules are in `pyproject.toml`.
+- `docs/` stores Sphinx sources (`docs/source/`) and make targets; built HTML lands under `docs/build/` (build artifact, not tracked). `docs/source/adr/` holds Architecture Decision Records (`NNNN-<slug>.md`, Japanese) — read them before proposing changes to tooling or conventions.
+- `tasks.py` defines Invoke tasks that bundle multiple steps (`ci`, `fix`, `audit`, `docs`, `apidoc`, `adr`); single commands are run directly, not wrapped (see ADR 0002). Toolchain and lint rules are in `pyproject.toml`.
 - `template_tasks.py` holds the template-only `new-project` task and helpers (tested in `test/test_template_tasks.py`); both files are excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 - `.github/` holds CI (`workflows/tests.yml`), the docs deploy (`workflows/docs.yml`), the Dependabot ruff auto fix (`workflows/dependabot-autofix.yml`), PR/issue templates, `CODEOWNERS`, and Dependabot config; `.gitlab-ci.yml` mirrors CI and Pages for GitLab (Dependabot itself is GitHub-only).
-- `.claude/skills/` holds project-shared Claude Code skills: `/quality-check` (run the 4 CI checks and fix failures), `/create-pr` (branch check → checks → gitmoji commit → Japanese PR), `/update-docs` (apidoc regen, new pages, local build). Keep them in sync with this file and `CONTRIBUTING.md` when rules change.
+- `.claude/skills/` holds project-shared Claude Code skills: `/quality-check` (run the 4 CI checks and fix failures), `/create-pr` (branch check → checks → gitmoji commit → Japanese PR), `/update-docs` (apidoc regen, new pages, local build), `/adr` (record a design decision made in the conversation). Keep them in sync with this file and `CONTRIBUTING.md` when rules change.
 - `.claude/skills/new-project/SKILL.md` is the template-only scaffolding guide; it is excluded from generated projects via `COPY_EXCLUDES`. <!-- template-only-line -->
 
 ## Language Policy
@@ -29,7 +29,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Tests: `uv run pytest` for the full suite (includes doctests from `src/` and a coverage report); use `-k` to target specific cases.
 - Lint/format: `uv run ruff check .` and `uv run ruff format .`.
 - Type check: `uv run ty check`.
-- Invoke tasks: `uv run invoke ci` (the 4 CI checks, run to completion with a summary), `uv run invoke fix` (`ruff check --fix` + `ruff format`), `uv run invoke audit` (`pip-audit`, same steps as CI). Do not add thin single-command wrappers.
+- Invoke tasks: `uv run invoke ci` (the 4 CI checks, run to completion with a summary), `uv run invoke fix` (`ruff check --fix` + `ruff format`), `uv run invoke audit` (`pip-audit`, same steps as CI), `uv run invoke adr <slug> --title "<Japanese title>"` (scaffold a new ADR). Do not add thin single-command wrappers.
 - Scaffold a new project from this template: `uv run invoke new-project -d <dir>` (the project name defaults to the basename of `<dir>`; supports `-p/--project-name`, `--author`, `--remote-url`, `--no-git`, and `--dry-run`). <!-- template-only-line -->
 - CI requires all of `ruff check`, `ruff format --check`, `ty check`, and `pytest` to pass — run `uv run invoke ci` locally before pushing. `CI_CHECKS` in `tasks.py` mirrors the workflows; keep both in sync when CI changes. CI additionally audits dependencies with `pip-audit` (weekly schedule on GitHub Actions).
 - On Dependabot PRs, `dependabot-autofix.yml` applies `ruff check --fix` and `ruff format`, commits the result to the PR branch, and re-checks ruff. Fixes ruff cannot apply automatically still fail and need manual work.
@@ -54,6 +54,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Docs are built with Sphinx + MyST (Markdown) + nbsphinx (notebooks); build locally with `uv run invoke docs` (HTML lands in `docs/build/html/`; `--strict` turns warnings into errors, `--open` opens the result, `--clean` rebuilds from scratch).
 - The root `README.md` is the single source of truth for setup and usage instructions — do not duplicate setup steps under `docs/`; `docs/source/` holds the API reference and writing-format examples only.
 - After adding or renaming modules in `src/`, run `uv run invoke apidoc` to regenerate the API reference (`docs/source/*.rst`); pages whose modules no longer exist are removed automatically.
+- Decisions about conventions, tooling, dependencies, or architecture are recorded as ADRs in `docs/source/adr/` (sections: 背景 / 検討した選択肢 / 決定 / 結果; status 提案中 / 採用 / 廃止 / NNNN により置換). Never rewrite an accepted ADR — add a new one and mark the old one as superseded. Only list alternatives that were actually considered.
 - New doc pages go in `docs/source/` and must be added to the `{toctree}` in `docs/source/index.md`.
 - Pushes to `main` deploy the built docs to GitHub Pages (or GitLab Pages) automatically.
 
@@ -61,6 +62,6 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - History uses short, present-tense messages with emoji prefixes (e.g., `🎉 init`, `🚧 add invoke`); follow the same concise style (<=72 chars).
 - Never commit directly to `main`; branch as `<type>/<short-kebab-description>` where type is one of `feature|fix|docs|refactor|test|ci|chore`, matching the gitmoji of the eventual commits.
 - Reference related issues/PRs in the body when applicable.
-- When development rules change, update `CONTRIBUTING.md` and this file in the same PR.
+- When development rules change, update `CONTRIBUTING.md` and this file in the same PR, and record the reasoning as an ADR in `docs/source/adr/` (`uv run invoke adr`, or the `/adr` skill).
 - Before opening a PR: ensure `ruff check`, `ruff format --check`, `ty check`, and `pytest` pass; include a brief summary of changes and commands executed.
 - For doc or CLI output changes, add screenshots or sample command output in the PR description when helpful.

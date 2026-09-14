@@ -13,4 +13,5 @@ caption: Contents:
 markdown_example
 notebook_example
 modules
+adr/index
 ```

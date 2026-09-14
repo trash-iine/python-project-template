@@ -19,5 +19,6 @@
 
 - [ ] ブランチ名が `<type>/<short-kebab-description>` 規約に従っている
 - [ ] 開発規則を変更した場合、CONTRIBUTING.md と AGENTS.md を同一 PR 内で更新した
+- [ ] 設計判断を伴う変更の場合、ADR（`docs/source/adr/`）を追加した
 - [ ] typing の抽象化機構や将来を見越した抽象を新たに導入していない（導入した場合は理由を変更概要に書いた）
 - [ ] マージ後にブランチを削除する

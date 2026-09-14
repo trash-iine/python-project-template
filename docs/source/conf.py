@@ -24,7 +24,8 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = []
+# adr/_template.md は `invoke adr` が展開するテンプレートなのでドキュメントとして扱わない。
+exclude_patterns = ["adr/_template.md"]
 
 # __init__.py で再エクスポートしたメンバーはサブモジュール側のページで文書化する。
 # __all__ に従うと同じ完全修飾名 (例: sample_project.sample_add) がパッケージ側にも

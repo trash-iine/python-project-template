@@ -87,6 +87,7 @@ ignore = [
 "*tasks.py" = [
     "A001",    # Shadowing built-in name
     "A002",    # Task options are CLI flags (e.g. `--open`) and may shadow built-in names
+    "ARG001",  # Invoke passes the context `c` to every task even when it is not used
     "ANN001",  # Missing type annotation for argument
     "ANN201",  # Missing return type annotation
     "T201",    # Using print function

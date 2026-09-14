@@ -169,6 +169,7 @@ $ uv run invoke docs
 | `fix` | `uv run invoke fix` | `ruff check --fix` と `ruff format` で自動修正 |
 | `audit` | `uv run invoke audit` | CI と同じ手順で依存パッケージの脆弱性を `pip-audit` で監査 |
 | `docs` | `uv run invoke docs [--clean] [--strict] [--open]` | Sphinx で HTML ドキュメントを生成 |
+| `adr` | `uv run invoke adr <slug> --title "<タイトル>"` | 設計判断の記録（ADR）を `docs/source/adr/` にテンプレートから作成 |
 | `apidoc` | `uv run invoke apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成し、参照先モジュールが消えたページを削除。モジュールを追加・リネームしたら実行 |
 | `new-project` | `uv run invoke new-project -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） | <!-- template-only-line -->
 
@@ -190,6 +191,7 @@ sample-project/
 ├── test/                     # テストコード（`test_*.py`）
 ├── docs/                     # Sphinx ドキュメント
 │   └── source/               # ドキュメントソース（Markdown / rst / ipynb）
+│       └── adr/              # 設計判断の記録（ADR）
 ├── .github/                  # CI・Pages デプロイ・PR / Issue テンプレート・CODEOWNERS・Dependabot
 ├── .gitlab-ci.yml            # GitLab CI（GitHub Actions と同等の CI と GitLab Pages デプロイ）
 ├── .vscode/                  # VSCode 推奨拡張と設定
