@@ -16,12 +16,12 @@ from invoke import task
 
 PROJECT_NAME = "sample-project"
 DOCS_SOURCE = Path("docs/source")
-DOCS_HTML_INDEX = Path("docs/build/html/index.html")
+DOCS_BUILD = Path("docs/build")
 SRC_ROOT = Path("src")
 ADR_DIR = DOCS_SOURCE / "adr"
 ADR_TEMPLATE = ADR_DIR / "_template.md"
 ADR_SLUG_PATTERN = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-ADR_FILE_PATTERN = re.compile(r"^(\d{4})-.+\.md$")
+ADR_GLOB = "[0-9][0-9][0-9][0-9]-*.md"
 
 # CI (.github/workflows/tests.yml / .gitlab-ci.yml) と同じ順序・内容。変更時は両方を同期させる。
 CI_CHECKS = [
@@ -97,14 +97,11 @@ def _stale_apidoc_pages(source_dir: Path, src_root: Path) -> list[Path]:
     return stale
 
 
-def _validate_adr_slug(slug: str) -> str:
+def _validate_adr_slug(slug: str) -> None:
     """ADR のファイル名に使う slug が英語 kebab-case であることを検証する。
 
     Args:
         slug (str): 検証する slug。
-
-    Returns:
-        str: 検証済みの slug。
 
     Raises:
         ValueError: slug が kebab-case (`^[a-z0-9]+(-[a-z0-9]+)*$`) でない場合。
@@ -113,7 +110,6 @@ def _validate_adr_slug(slug: str) -> str:
     if not ADR_SLUG_PATTERN.match(slug):
         msg = f"ADR slug must be kebab-case (e.g. 'use-invoke-for-tasks'): {slug!r}"
         raise ValueError(msg)
-    return slug
 
 
 def _next_adr_number(adr_dir: Path) -> int:
@@ -126,8 +122,7 @@ def _next_adr_number(adr_dir: Path) -> int:
         int: 既存の最大番号 + 1。ADR がなければ 1。
 
     """
-    numbers = [int(m.group(1)) for path in adr_dir.glob("*.md") if (m := ADR_FILE_PATTERN.match(path.name))]
-    return max(numbers, default=0) + 1
+    return max((int(path.name[:4]) for path in adr_dir.glob(ADR_GLOB)), default=0) + 1
 
 
 def _render_adr(template: str, number: int, title: str, date: datetime.date) -> str:
@@ -147,7 +142,7 @@ def _render_adr(template: str, number: int, title: str, date: datetime.date) -> 
 
 
 @task
-def adr(c, slug, title=""):
+def adr(c, slug, title=""):  # noqa: ARG001  # Invoke は未使用でもコンテキストを渡す
     """設計判断の記録 (ADR) をテンプレートから新規作成する。
 
     Args:
@@ -204,6 +199,7 @@ def fix(c):
         c (Context): Invoke のコンテキスト。
 
     """
+    # .github/workflows/dependabot-autofix.yml と同じ内容。変更時は両方を同期させる。
     c.run("ruff check --fix .", warn=True, pty=True)
     c.run("ruff format .", pty=True)
 
@@ -216,6 +212,7 @@ def audit(c):
         c (Context): Invoke のコンテキスト。
 
     """
+    # CI (.github/workflows/tests.yml / .gitlab-ci.yml) と同じ内容。変更時は両方を同期させる。
     with tempfile.TemporaryDirectory() as tmp:
         requirements = Path(tmp) / "requirements-audit.txt"
         c.run(f"uv export --format requirements-txt --no-hashes --no-emit-project -o {requirements}")
@@ -223,7 +220,7 @@ def audit(c):
 
 
 @task
-def docs(c, output="html", *, clean=False, strict=False, open=False):
+def docs(c, output="html", *, clean=False, strict=False, open=False):  # noqa: A002  # タスク引数は CLI フラグ (--open) になる
     """ドキュメントをビルドする。
 
     Args:
@@ -231,7 +228,7 @@ def docs(c, output="html", *, clean=False, strict=False, open=False):
         output (str): `make -C docs` に渡す Sphinx ビルダー名。
         clean (bool): True ならビルド前に `make -C docs clean` を実行する。
         strict (bool): True なら warning をエラー扱いにする (`-W --keep-going`)。
-        open (bool): True ならビルド後に `docs/build/html/index.html` をブラウザで開く。
+        open (bool): True ならビルド後に `docs/build/<output>/index.html` をブラウザで開く。
 
     """
     if clean:
@@ -239,7 +236,7 @@ def docs(c, output="html", *, clean=False, strict=False, open=False):
     sphinxopts = ' SPHINXOPTS="-W --keep-going"' if strict else ""
     c.run(f"make -C docs {output}{sphinxopts}", pty=True)
     if open:
-        webbrowser.open(DOCS_HTML_INDEX.resolve().as_uri())
+        webbrowser.open((DOCS_BUILD / output / "index.html").resolve().as_uri())
 
 
 @task
