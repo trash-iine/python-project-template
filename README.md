@@ -173,9 +173,7 @@ $ uv run invoke docs
 | `apidoc` | `uv run invoke apidoc` | `sphinx-apidoc` で API リファレンス（`docs/source/*.rst`）を再生成し、参照先モジュールが消えたページを削除。モジュールを追加・リネームしたら実行 |
 | `new-project` | `uv run invoke new-project -d <dir>` | このテンプレートから新規プロジェクトを作成（`--dry-run` 対応） | <!-- template-only-line -->
 
-CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml`）では `ruff check` / `ruff format --check` / `ty check` / `pytest` が実行されます。push 前に `uv run invoke ci` で同じチェックを通しておくと安全です。
-
-CI ではこの 4 チェックに加えて、依存パッケージの脆弱性監査（`pip-audit`）も実行されます（GitHub では週次でも自動実行）。ローカルでは `uv run invoke audit` で同じ監査を実行できます。
+CI（GitHub では `.github/workflows/tests.yml`、GitLab では `.gitlab-ci.yml`）では上表の 4 チェックに加えて、依存パッケージの脆弱性監査（`pip-audit`）も実行されます（GitHub では週次でも自動実行）。push 前に `uv run invoke ci` と `uv run invoke audit` で同じ内容をローカルで通しておくと安全です。
 
 ## コントリビューション
 
