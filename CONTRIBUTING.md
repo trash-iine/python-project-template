@@ -9,6 +9,7 @@
   - 例外メッセージなどコード中の文字列リテラルは英語のままとします(ログや doctest の出力が環境に依存しないようにするため)
 - PR / MR の説明文・Issue・レビューコメント: **日本語**
 - 本書は日本語で記述し、AGENTS.md は AI 向けのため英語で記述します
+- 言語の境界をこう引いた理由は ADR 0003 を参照してください
 
 ## 開発ワークフロー
 
@@ -68,6 +69,7 @@
 - 関数シグネチャには公開・非公開を問わず型ヒントを書きます(型チェッカーは `ty`)。使う型は組み込み型・標準ライブラリの型・自作クラス・`X | None`・`list[str]` などの**具体型**に限ります。
 - `typing` の抽象化機構(`TypeVar` / `Generic` / `Protocol` / `overload` / `TypeAlias` / `cast` / `TYPE_CHECKING` など)は、**異なる型の実装を実際に複数受け取る箇所**でのみ使います。実装が 1 つしかないものを汎用化しないでください。`Any` は禁止です(Ruff ANN401)。
 - 型エラーは具体型の修正で解決します。`cast` や `# ty: ignore` で黙らせないでください。どうしても抑制する場合は上記の抑制ポリシーに従い、理由コメントを付けます。
+- この方針を採った理由と、型情報を配布しない(`py.typed` を置かない)判断は ADR 0004 / ADR 0005 を参照してください。
 
 ### docstring
 
@@ -76,7 +78,7 @@
 - 引数を持つ関数は `Args:` セクションに**すべての引数**を `name (type): 説明` 形式で書きます。非公開関数・Invoke タスクも対象です。戻り値があれば `Returns:`、例外を送出するなら `Raises:` を書きます。
 - 公開関数には doctest 形式の `Examples:` セクションを付けます。参照例: `src/sample_project/sample_add.py`
 - テスト関数(`test/` 配下)は要約行のみで構いません(parametrize の引数説明は冗長なため)。
-- Ruff の D400 / D401 / D403 / D415 は英語 docstring 前提のヒューリスティック(末尾ピリオド・命令形・先頭語の大文字化)のため `pyproject.toml` で無効化しています。
+- Ruff の D400 / D401 / D403 / D415 は英語 docstring 前提のヒューリスティック(末尾ピリオド・命令形・先頭語の大文字化)のため `pyproject.toml` で無効化しています(ADR 0003)。
 - `Args:` の引数漏れは Ruff D417 が検出します。`Args:` セクション自体の有無はツールで検出できないため、レビューで確認してください。
 
 ### 設計方針(必要十分)
@@ -115,16 +117,8 @@
 
 - セットアップ後に `uv run pre-commit install` を一度実行してください。コミット時に Ruff の自動修正・フォーマットと基本的な検査(YAML / TOML 構文、行末空白など)が自動実行されます。
   - フックは高速な自動修正系のみです。`ty` や `pytest` は実行時間が長いためフックに含めず、CI で担保します。CI では Ruff を直接実行しているため、pre-commit を CI で重ねて実行することもしません。
-- push 前に `uv run invoke ci` で CI と同じ 4 チェックをローカルで通してください。失敗しても最後まで実行され、末尾に各チェックの成否が集計されます。CI で実行される内容は次のとおりです。
-
-```bash
-$ uv run ruff check .
-$ uv run ruff format --check .
-$ uv run ty check
-$ uv run pytest
-```
-
-- `tasks.py` の `CI_CHECKS` は CI ワークフロー(`.github/workflows/tests.yml` / `.gitlab-ci.yml`)のミラーです。CI のチェック内容を変えるときは両方を同期させてください。
+- push 前に `uv run invoke ci` で CI と同じ 4 チェックをローカルで通してください。失敗しても最後まで実行され、末尾に各チェックの成否が集計されます。
+- チェックの内容は `tasks.py` の `CI_CHECKS` が単一の情報源で、CI ワークフロー(`.github/workflows/tests.yml` / `.gitlab-ci.yml`)のミラーです。CI のチェック内容を変えるときは両方を同期させてください。
 - Ruff の自動修正とフォーマットは `uv run invoke fix` でまとめて適用できます。
 - CI では上記に加えて依存パッケージの脆弱性監査(`pip-audit`)が実行されます(GitHub Actions では週次スケジュールでも実行)。ローカルでは `uv run invoke audit` で同じ監査を実行できます。
 - Invoke タスクは複数ステップを束ねるもの(`ci|fix|audit|docs|apidoc|adr`)に限定しています。単独コマンドの薄いラッパーは追加しないでください(理由は ADR 0002 を参照)。

@@ -54,7 +54,7 @@ It is also a Python project template (published as `trash-iine/python-project-te
 - Docs are built with Sphinx + MyST (Markdown) + nbsphinx (notebooks); build locally with `uv run invoke docs` (HTML lands in `docs/build/html/`; `--strict` turns warnings into errors, `--open` opens the result, `--clean` rebuilds from scratch).
 - The root `README.md` is the single source of truth for setup and usage instructions — do not duplicate setup steps under `docs/`; `docs/source/` holds the API reference and writing-format examples only.
 - After adding or renaming modules in `src/`, run `uv run invoke apidoc` to regenerate the API reference (`docs/source/*.rst`); pages whose modules no longer exist are removed automatically.
-- Decisions about conventions, tooling, dependencies, or architecture are recorded as ADRs in `docs/source/adr/` (sections: 背景 / 検討した選択肢 / 決定 / 結果; status 提案中 / 採用 / 廃止 / NNNN により置換). Never rewrite an accepted ADR — add a new one and mark the old one as superseded. Only list alternatives that were actually considered.
+- Decisions about conventions, tooling, dependencies, or architecture are recorded as ADRs in `docs/source/adr/`; see the 設計判断の記録 (ADR) section of `CONTRIBUTING.md` for the required sections, status vocabulary, and supersession rule.
 - New doc pages go in `docs/source/` and must be added to the `{toctree}` in `docs/source/index.md`.
 - Pushes to `main` deploy the built docs to GitHub Pages (or GitLab Pages) automatically.
 

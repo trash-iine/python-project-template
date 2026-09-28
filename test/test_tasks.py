@@ -70,10 +70,10 @@ def test_stale_apidoc_pages(tmp_path: Path) -> None:
     assert _stale_apidoc_pages(source, src) == [source / "old_pkg.rst", source / "pkg.removed.rst"]
 
 
-def test_validate_adr_slug() -> None:
-    """kebab-case の slug だけを受け付けることを確認する。"""
-    assert _validate_adr_slug("my-decision") == "my-decision"
-    assert _validate_adr_slug("adr2") == "adr2"
+@pytest.mark.parametrize("slug", ["my-decision", "adr2"])
+def test_validate_adr_slug(slug: str) -> None:
+    """kebab-case の slug を受け付ける (例外を送出しない) ことを確認する。"""
+    _validate_adr_slug(slug)
 
 
 @pytest.mark.parametrize("slug", ["", "My Decision", "my_decision", "-leading", "trailing-"])

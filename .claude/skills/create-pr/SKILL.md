@@ -20,11 +20,7 @@ allowed-tools: Bash(git *) Bash(gh *) Bash(uv run *)
 
 ### 2. 品質チェック
 
-CI と同じ 4 チェック（`ruff check` / `ruff format --check` / `ty check` / `pytest`）を一括実行する。失敗があれば `/quality-check` skill の方針で修正してから先へ進む:
-
-```bash
-uv run invoke ci
-```
+`/quality-check` skill の手順（`uv run invoke ci`）でチェックを実行し、green になってから先へ進む。
 
 ### 3. コミット
 
